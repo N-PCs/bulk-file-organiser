@@ -1,7 +1,8 @@
  
 import argparse;    # for argument parsing 
 import pathlib;     # for file paths
-import sys;
+import sys;         # for exiting script
+import shutil;      # provides high level file operations like moving files.
 
 # defining a dictionary as the brain of the organiser
 FILE_TYPE_MAP= {
@@ -53,6 +54,37 @@ def organize_directory(source_path: pathlib.Path):
             # Verify File Scan with a Print Feedback Loop
             print(f" - Found file: {item.name}, Extension: {file_extension}")
 
+            # Set a Default Destination
+            destination_folder_name='Others'
+
+            # Implement File Classification Logic Using a Nested Loop and Python's 'in' Operator
+            for category, extensions in FILE_TYPE_MAP.items():
+                if file_extension in extensions:
+                    # if match if found, update the our destination folder name 
+                    destination_folder_name = category
+
+                    # now break out of inner loop after finding a match 
+                    break
+
+            # Construct the full destination directory path using `source_path / destination_folder_name`.
+            destination_dir = source_path / destination_folder_name
+
+            # Create Destination Directories with Python Pathlib
+            destination_dir.mkdir(parents=True, exist_ok=True)
+
+            # Construct the Full Destination File Path in Python
+            destination_file_path = destination_dir / item.name
+
+            # add a print statement to verify our full destination path
+            print(f"File: '{item.name}' -> Destination: '{destination_dir}'")
+
+            # Move Files with shutil.move in Python
+            shutil.move(item, destination_file_path)
+
+            # add a print statement to give the user immediate feedback
+            print(f"Moved: '{item.name}' -> '{destination_file_path}'")
+
+        
 
 if __name__=="__main__":        # this block of code runs only when execued from command line , this is our main entry point 
     parser = argparse.ArgumentParser(description="Organise files in a directory by thei type!")     # object creation for parsing commands and description provides brief summary of what program does
