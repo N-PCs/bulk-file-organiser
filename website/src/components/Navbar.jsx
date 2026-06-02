@@ -1,0 +1,23 @@
+import './Navbar.css'
+
+export default function Navbar() {
+  return (
+    <header className="navbar">
+      <div className="container navbar-inner">
+        <a href="#" className="navbar-brand">
+          urFiles
+        </a>
+
+        <nav className="navbar-links" aria-label="Main navigation">
+          <a href="#features">Features</a>
+          <a href="#how-it-works">How it works</a>
+          <a href="#themes">Themes</a>
+        </nav>
+
+        <a href="#download" className="btn btn-primary navbar-cta">
+          Download
+        </a>
+      </div>
+    </header>
+  )
+}

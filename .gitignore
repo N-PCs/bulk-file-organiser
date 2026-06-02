@@ -1,0 +1,50 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+dist/
+build/
+*.egg
+venv/
+.env
+
+# Compiled binaries
+*.exe
+*.o
+*.obj
+*.res
+*.ilk
+*.pdb
+*.manifest
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+*~
+
+# Project specific
+organizer.exe
+organizer.o
+organizer.res
+organizer.log
+release/
+
+# Node / Website
+website/node_modules/
+website/dist/
+
+# Archives
+*.zip
+*.tar.gz

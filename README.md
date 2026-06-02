@@ -1,78 +1,78 @@
-# Bulk File Organizer
+# Bulk File Organizer (urFiles)
 
-A powerful and customizable command-line utility built with Python to help you automatically organize files in any directory. This tool scans a specified folder (like a cluttered 'Downloads' folder) and intelligently moves files into subdirectories based on their type (e.g., images, documents, videos), bringing order to chaos in seconds.
+A powerful, native C++ Windows utility that organizes cluttered folders into categorized subdirectories — Images, Documents, Audio, Video, Archives — in seconds. Comes with a GUI, CLI mode, dry-run preview, PDF reports, and 5 UI themes.
 
 ## Features
 
-*   **Customizable Rules**: Easily define your own organization rules by editing a simple `config.json` file. No need to modify the Python code to add new file types or change destination folders.
-*   **Automatic Folder Creation**: Destination folders (e.g., 'Images', 'Documents') are created automatically if they don't already exist.
-*   **Intelligent Conflict Resolution**: If a file with the same name already exists in the destination folder, the script won't crash or overwrite. It will intelligently rename the new file (e.g., `report (1).pdf`).
-*   **Safety First with Dry-Run Mode**: Preview all file operations without making any actual changes using the `--dry-run` flag. This lets you see what will happen before you commit.
-*   **Comprehensive Logging**: A detailed `organizer.log` file is created, recording every action the script takes, from successful moves to warnings and errors. This provides a full audit trail.
-*   **User-Friendly Progress Bar**: For large directories, a real-time progress bar shows you the status of the organization process, so you're never left guessing.
-*   **Robust Error Handling**: The script is designed to handle common issues gracefully, such as missing configuration files or permission errors during file moves, providing clear feedback instead of crashing.
-*   **Simple Command-Line Interface (CLI)**: A clean and simple interface allows you to specify the target directory and options directly from your terminal.
+- **Smart Extension Sorting** — Moves loose files into category folders based on customizable rules
+- **Dry-Run Preview** — Preview every move before committing (enabled by default)
+- **PDF Reports** — Generate detailed organization reports with file names, sizes, and status
+- **Full Audit Logging** — Every action recorded in `organizer.log` with timestamps
+- **Conflict Resolution** — Duplicates renamed automatically (e.g. `report (1).pdf`)
+- **Five UI Themes** — Midnight Dark, Minimalist Light, Nordic Frost, Forest Emerald, Neon Cyberpunk
+- **Editable Config** — Add file types or categories via `config.json` — no recompile needed
+- **GUI + CLI Modes** — Double-click for the GUI, or use `organizer.bat` for scripting
 
-## Installation
+## Quick Start
 
-Follow these steps to set up the Bulk File Organizer on your local machine. This guide assumes you have Python 3 installed and are comfortable with the command line.
+1. Download the latest ZIP from the [website](https://urfiles.app) or grab it from `release/`
+2. Extract anywhere
+3. Double-click `run.bat` to launch the GUI
 
-1.  **Clone the Repository**
-
-    First, you need to get the project files. If you're using Git, you can clone the repository from GitHub.
-
-    ```sh
-    # Replace the URL with your actual repository URL
-    git clone https://github.com/your-username/bulk-file-organizer.git
-
-    # Navigate into the newly created project directory
-    cd bulk-file-organizer
-    ```
-
-2.  **Create a Python Virtual Environment**
-
-    It is a strong best practice to use a virtual environment to keep the project's dependencies isolated from other Python projects on your system.
-
-    ```sh
-    # This command creates a new directory named 'venv' for the virtual environment
-    python -m venv venv
-    ```
-
-3.  **Activate the Virtual Environment**
-
-    Before you can install packages into the virtual environment, you must activate it. The command differs depending on your operating system.
-
-    *   **On Windows:**
-        ```sh
-        venv\Scripts\activate
-        ```
-    *   **On macOS and Linux:**
-        ```sh
-        source venv/bin/activate
-        ```
-    After activation, you should see `(venv)` at the beginning of your command prompt.
-
-4.  **Install Required Dependencies**
-
-    This project has one external dependency, `tqdm`, which is used to display the progress bar. Use `pip`, Python's package installer, to install it.
-
-    ```sh
-    # This command will download and install the tqdm library into your active virtual environment
-    pip install tqdm
-    ```
-
-    You are now ready to run the application!
-
-    ## Usage
-
-Once the installation is complete, you can run the Bulk File Organizer from your terminal. Make sure your virtual environment is still activated.
-
-### Basic Organization
-
-To run the script and organize a directory, provide the path to the target directory as the main argument.
-
-**Warning:** This command will make changes to your file system. It is highly recommended to run a `dry-run` first (see below).
+### CLI Usage
 
 ```sh
-# Replace '/path/to/your/downloads' with the actual path to the folder you want to clean up.
-python organizer.py /path/to/your/downloads
+.\organizer.bat C:\Downloads --dry-run
+.\organizer.bat C:\Downloads
+```
+
+## Building from Source
+
+### Requirements
+
+- Windows 10+
+- Python 3.10+ (for the Python version)
+- MinGW-w64 or MSVC (for C++ version)
+
+### Python
+
+```sh
+python -m venv venv
+venv\Scripts\activate
+pip install tqdm
+python organizer.py C:\Downloads
+```
+
+### C++ (GUI)
+
+```sh
+.\build.bat
+```
+
+## Website
+
+The marketing website lives in `website/` and is built with React + Vite.
+
+```sh
+cd website
+npm install
+npm run dev
+```
+
+## Project Structure
+
+```
+├── organizer.py          # Python CLI version
+├── organizer.bat         # CLI wrapper
+├── run.bat               # GUI launcher
+├── gui.cpp               # Native Windows GUI (C++)
+├── config.json           # Sorting rules configuration
+├── build.bat             # C++ build script
+├── scripts/              # Release automation
+├── website/              # React marketing site
+└── release/              # Packaged binaries
+```
+
+## License
+
+MIT

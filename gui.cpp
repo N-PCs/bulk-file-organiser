@@ -248,6 +248,7 @@ std::wstring g_statusText = L"Ready to organize.";
 std::wstring g_lastReportPath;
 std::vector<MovedFileInfo> g_lastMovedFiles;
 std::wstring g_lastSourceDir;
+bool g_lastDryRun = false;
 
 // Dynamic DPI Scaling Factor (calculated at startup based on screen/monitor)
 double g_scaleDPI = 1.0;
@@ -268,7 +269,7 @@ void UpdateThemeBrushes();
 std::string EscapePDFText(const std::wstring& wtext);
 std::wstring TruncateText(const std::wstring& text, size_t maxLen);
 std::wstring FormatSize(uint64_t bytes);
-void GeneratePDFReport(const std::wstring& reportPath, const std::vector<MovedFileInfo>& movedFiles, bool dryRun);
+void GeneratePDFReport(const std::wstring& outputPath, const std::wstring& targetFolder, const std::vector<MovedFileInfo>& movedFiles, bool dryRun);
 void ShowReportDialog(HWND hParent, const std::vector<MovedFileInfo>& files, const std::wstring& sourceDir);
 LRESULT CALLBACK ReportDialogProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -664,6 +665,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
                             g_lastReportPath.clear();
                             g_lastMovedFiles.clear();
                             g_lastSourceDir.clear();
+                            g_lastDryRun = false;
                             ShowWindow(g_hwndViewReportBtn, SW_HIDE);
                             InvalidateRect(hWnd, NULL, FALSE);
 
@@ -1131,7 +1133,7 @@ std::wstring FormatSize(uint64_t bytes) {
 }
 
 // Generates a fully compliant standard PDF report listing file operations
-void GeneratePDFReport(const std::wstring& reportPath, const std::vector<MovedFileInfo>& movedFiles, bool dryRun) {
+void GeneratePDFReport(const std::wstring& outputPath, const std::wstring& targetFolder, const std::vector<MovedFileInfo>& movedFiles, bool dryRun) {
     if (movedFiles.empty()) return;
 
     // Calculate total space
@@ -1189,12 +1191,12 @@ void GeneratePDFReport(const std::wstring& reportPath, const std::vector<MovedFi
 
             // Title Text
             ss << "BT /F2 18 Tf 0.1 0.1 0.25 rg 55 765 Td (" 
-               << (dryRun ? "Bulk File Organizer - DRY RUN REPORT" : "Bulk File Organizer - File Transfer Report") 
+               << (dryRun ? "urFiles - DRY RUN REPORT" : "urFiles - File Transfer Report") 
                << ") Tj ET\n";
 
             // Metadata Lines
             ss << "BT /F1 9 Tf 0.35 0.35 0.45 rg 55 745 Td (Report generated on: " << EscapePDFText(timeStr) << ") Tj ET\n";
-            ss << "BT /F1 9 Tf 0.35 0.35 0.45 rg 55 730 Td (Target Folder: " << EscapePDFText(reportPath) << ") Tj ET\n";
+            ss << "BT /F1 9 Tf 0.35 0.35 0.45 rg 55 730 Td (Target Folder: " << EscapePDFText(targetFolder) << ") Tj ET\n";
 
             // Summary Info Strip
             ss << "BT /F2 10 Tf 0.15 0.5 0.15 rg 55 712 Td (Status: " 
@@ -1312,12 +1314,12 @@ void GeneratePDFReport(const std::wstring& reportPath, const std::vector<MovedFi
         contentSs << "<< /Length " << content_str.length() << " >>\n"
                   << "stream\n"
                   << content_str
-                  << "endstream";
+                  << "\nendstream";
         pdfObjects.push_back(contentSs.str());
     }
 
     // Write binary stream
-    std::ofstream out(std::filesystem::path(reportPath), std::ios::binary);
+    std::ofstream out(std::filesystem::path(outputPath), std::ios::binary);
     if (!out.is_open()) return;
 
     out << "%PDF-1.4\n";
@@ -1518,7 +1520,7 @@ LRESULT CALLBACK ReportDialogProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 
                     if (GetSaveFileNameW(&ofn)) {
                         try {
-                            GeneratePDFReport(savePath, *files, false);
+                            GeneratePDFReport(savePath, *sourceDir, *files, g_lastDryRun);
                             MessageBoxW(hWnd, L"PDF report saved successfully.", L"Export Complete", MB_OK | MB_ICONINFORMATION);
                         } catch (const std::exception& e) {
                             std::string err = e.what();
@@ -1849,7 +1851,23 @@ void RunOrganize(OrganizeParams* params) {
     // Store report data for in-app preview
     g_lastMovedFiles = movedFiles;
     g_lastSourceDir = sourcePathStr;
+    g_lastDryRun = dryRun;
     g_lastReportPath = L"";
+
+    if (!movedFiles.empty()) {
+        std::filesystem::path reportPath = sourcePath / (dryRun ? L"organization_report_preview.pdf" : L"organization_report.pdf");
+        try {
+            GeneratePDFReport(reportPath.wstring(), sourcePath.wstring(), movedFiles, dryRun);
+            g_lastReportPath = reportPath.wstring();
+            std::wstring* logPdf = new std::wstring(L"[INFO] Generated PDF report: " + reportPath.filename().wstring());
+            PostMessage(hwnd, WM_APP_LOG, 0, (LPARAM)logPdf);
+        } catch (const std::exception& e) {
+            std::string errStr = e.what();
+            std::wstring wErr(errStr.begin(), errStr.end());
+            std::wstring* logPdfErr = new std::wstring(L"[ERROR] Failed to generate PDF report: " + wErr);
+            PostMessage(hwnd, WM_APP_LOG, 2, (LPARAM)logPdfErr);
+        }
+    }
 
     std::wstring summary = L"[SUCCESS] Successfully processed " + std::to_wstring(successCount) + L" of " + std::to_wstring(total) + L" files!";
     std::wstring* logSummary = new std::wstring(summary);
@@ -2068,7 +2086,7 @@ int RunCLI(const std::wstring& targetDirStr, bool dryRun) {
     // Generate the PDF report
     std::filesystem::path reportPath = sourcePath / (dryRun ? L"organization_report_preview.pdf" : L"organization_report.pdf");
     try {
-        GeneratePDFReport(reportPath.wstring(), movedFiles, dryRun);
+        GeneratePDFReport(reportPath.wstring(), sourcePath.wstring(), movedFiles, dryRun);
         std::wcout << L"\n[INFO] Generated PDF Report: " << reportPath.filename().wstring() << std::endl;
     } catch (const std::exception& e) {
         std::string errStr = e.what();
