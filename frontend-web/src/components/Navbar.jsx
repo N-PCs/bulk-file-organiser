@@ -5,7 +5,7 @@ export default function Navbar() {
     <header className="navbar">
       <div className="container navbar-inner">
         <a href="#" className="navbar-brand">
-          urFiles
+          urFM
         </a>
 
         <nav className="navbar-links" aria-label="Main navigation">

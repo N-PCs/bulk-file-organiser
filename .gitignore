@@ -38,14 +38,14 @@ desktop.ini
 organizer.exe
 organizer.o
 organizer.res
-urfiles
-urfiles.exe
+urfm
+urfm.exe
 organizer.log
 release/
 
 # Node / Website
-website/node_modules/
-website/dist/
+frontend-web/node_modules/
+frontend-web/dist/
 
 # Archives
 *.zip

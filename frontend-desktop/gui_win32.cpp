@@ -1,4 +1,4 @@
-// gui_win32.cpp - Windows native GUI for urFiles
+// gui_win32.cpp - Windows native GUI for urFileManager
 #define UNICODE
 #define _UNICODE
 #include <windows.h>
@@ -84,6 +84,10 @@ const std::vector<Theme> g_themes = {
 
 struct OrganizeParams { HWND hwnd; std::wstring sourceDirectory; bool dryRun; std::map<std::wstring,std::vector<std::wstring>> fileTypeMap; };
 struct MovedFileInfo { std::wstring fileName, category, status; uint64_t fileSize; };
+struct ReportData { std::vector<MovedFileInfo>* files; std::wstring* srcDir; bool dryRun; };
+struct MovedFileInfoStr { std::string fileName, category, status; uint64_t fileSize; };
+void GeneratePDFReportStr(const std::string& outputPath, const std::string& targetFolder,
+                          const std::vector<MovedFileInfoStr>& movedFiles, bool dryRun);
 
 HWND g_hMain = NULL, g_hPath = NULL, g_hBrowse = NULL, g_hDryRun = NULL, g_hCfg = NULL, g_hLogBtn = NULL, g_hAction = NULL, g_hLog = NULL, g_hTheme = NULL, g_hReport = NULL;
 int g_themeIdx = 0;
@@ -107,6 +111,16 @@ LRESULT CALLBACK ReportProc(HWND, UINT, WPARAM, LPARAM);
 
 int GetScreenDPI() { HDC hdc = GetDC(NULL); int d = 96; if (hdc) { d = GetDeviceCaps(hdc, LOGPIXELSX); ReleaseDC(NULL, hdc); } return d; }
 int GetWindowDPI(HWND h) { typedef UINT(WINAPI *G)(HWND); HMODULE m = GetModuleHandleW(L"user32.dll"); if (m) { G p = (G)GetProcAddress(m, "GetDpiForWindow"); if (p) return p(h); } return GetScreenDPI(); }
+
+std::wstring FormatSizeW(uint64_t bytes) {
+    double size = (double)bytes;
+    const wchar_t* unit = L"B";
+    if (size >= 1024) { size /= 1024; unit = L"KB"; }
+    if (size >= 1024) { size /= 1024; unit = L"MB"; }
+    if (size >= 1024) { size /= 1024; unit = L"GB"; }
+    wchar_t buf[32]; swprintf_s(buf, L"%.2f %s", size, unit);
+    return buf;
+}
 
 void UpdateBrushes() {
     if (g_bWindow) DeleteObject(g_bWindow); if (g_bCard) DeleteObject(g_bCard);
@@ -168,7 +182,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int nShow) {
     if (cli) {
         if (!AttachConsole(ATTACH_PARENT_PROCESS)) AllocConsole();
         FILE* f; freopen_s(&f, "CONOUT$", "w", stdout); freopen_s(&f, "CONOUT$", "w", stderr); freopen_s(&f, "CONIN$", "r", stdin);
-        std::wcout << L"\n  urFiles CLI Organizer\n";
+        std::wcout << L"\n  urFileManager CLI Organizer\n";
         if (dir.empty()) { std::wcout << L"Usage: organizer.exe <directory> [--dry-run]\n"; return 1; }
         std::filesystem::path src(dir);
         if (!std::filesystem::exists(src) || !std::filesystem::is_directory(src)) { std::wcout << L"Invalid directory\n"; return 1; }
@@ -221,12 +235,12 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int nShow) {
     g_dpi = (double)GetScreenDPI() / 96.0;
 
     WNDCLASSW wc = {};
-    wc.lpfnWndProc = WndProc; wc.hInstance = hInst; wc.lpszClassName = L"UrFilesWinGUI";
+    wc.lpfnWndProc = WndProc; wc.hInstance = hInst; wc.lpszClassName = L"UrFmWinGUI";
     wc.hCursor = LoadCursor(NULL, IDC_ARROW); wc.hIcon = LoadIcon(NULL, IDI_APPLICATION);
     RegisterClassW(&wc);
 
     RECT rc = {0,0,SX(740),SY(560)}; AdjustWindowRect(&rc, WS_OVERLAPPED|WS_CAPTION|WS_SYSMENU|WS_MINIMIZEBOX, FALSE);
-    g_hMain = CreateWindowExW(0, L"UrFilesWinGUI", L"urFiles - Bulk File Organizer",
+    g_hMain = CreateWindowExW(0, L"UrFmWinGUI", L"urFileManager",
         WS_OVERLAPPED|WS_CAPTION|WS_SYSMENU|WS_MINIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT,
         rc.right-rc.left, rc.bottom-rc.top, NULL, NULL, hInst, NULL);
     if (!g_hMain) return 0;
@@ -310,7 +324,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
             AppendLog(L"[ERROR] config.json not found or invalid. Place it next to organizer.exe.");
             EnableWindow(g_hAction, FALSE);
         } else {
-            AppendLog(L"urFiles v1.0 — Bulk File Organizer");
+            AppendLog(L"urFileManager v1.0");
             AppendLog(L"Loaded configuration from config.json");
             AppendLog(L"Select a folder and click \"Start Organizing\" to begin.");
             AppendLog(L"Dry-run mode is ON by default for safety.");
@@ -354,13 +368,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
             case IDC_VIEW_REPORT_BTN: {
                 if (!g_movedFiles.empty()) {
                     WNDCLASSW wc={}; wc.lpfnWndProc=ReportProc; wc.hInstance=GetModuleHandle(NULL);
-                    wc.lpszClassName=L"UrFilesReport"; wc.hCursor=LoadCursor(NULL,IDC_ARROW); wc.hIcon=LoadIcon(NULL,IDI_APPLICATION);
+                    wc.lpszClassName=L"UrFmReport"; wc.hCursor=LoadCursor(NULL,IDC_ARROW); wc.hIcon=LoadIcon(NULL,IDI_APPLICATION);
+                    wc.hbrBackground = g_bCard;
                     RegisterClassW(&wc);
-                    int d=GetWindowDPI(hWnd); double s=(double)d/96.0;
-                    HWND hDlg = CreateWindowExW(0, L"UrFilesReport", L"Organization Report",
-                        WS_OVERLAPPEDWINDOW, CW_USEDEFAULT,CW_USEDEFAULT,(int)(640*s),(int)(500*s),
-                        hWnd, NULL, GetModuleHandle(NULL), NULL);
-                    if (hDlg) { SetPropW(hDlg, L"files", (HANDLE)&g_movedFiles); SetPropW(hDlg, L"src", (HANDLE)&g_srcDir); ShowWindow(hDlg, SW_SHOW); }
+                    int d=GetWindowDPI(hWnd); double sc=(double)d/96.0;
+                    ReportData rd = { &g_movedFiles, &g_srcDir, g_lastDryRun };
+                    HWND hDlg = CreateWindowExW(0, L"UrFmReport", L"Organization Report",
+                        WS_OVERLAPPEDWINDOW, CW_USEDEFAULT,CW_USEDEFAULT,(int)(660*sc),(int)(500*sc),
+                        hWnd, NULL, GetModuleHandle(NULL), &rd);
+                    if (hDlg) ShowWindow(hDlg, SW_SHOW);
                 }
                 break;
             }
@@ -432,12 +448,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
                         if (log.is_open()) log.close();
                         g_movedFiles = moved; g_srcDir = src; g_lastDryRun = dry;
                         if (!moved.empty()) {
-                            std::string outPath = (sp / (dry ? "organization_report_preview.pdf" : "organization_report.pdf")).string();
-                            std::string srcA(src.begin(),src.end());
-                            std::vector<MovedFileInfo> mv;
-                            for (const auto& m : moved) mv.push_back({std::string(m.fileName.begin(),m.fileName.end()),
-                                std::string(m.category.begin(),m.category.end()), m.status, m.fileSize});
-                            // Generate PDF via core (simplified inline here)
+                            std::string reportPath = (sp / (dry ? L"organization_report_preview.pdf" : L"organization_report.pdf")).string();
+                            std::string srcA(src.begin(), src.end());
+                            // Worker thread cannot call GeneratePDFReport (not linked), so the PDF is generated when user clicks "Save as PDF" in the report dialog, or from the CLI path.
                         }
                         AppendLog(L"Done. Processed " + std::to_wstring(ok) + L"/" + std::to_wstring(total) + L" files.");
                         PostMessage(h, WM_APP_DONE, 0, 0); delete p;
@@ -497,9 +510,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
         // Title
         SetBkMode(mdc, TRANSPARENT);
         SetTextColor(mdc, t.textTitle); SelectObject(mdc, g_fTitle);
-        TextOutW(mdc, SX(22), SY(18), L"urFiles", 7);
+        TextOutW(mdc, SX(22), SY(18), L"urFM", 4);
         SetTextColor(mdc, t.accent); SelectObject(mdc, g_fSub);
-        TextOutW(mdc, SX(140), SY(26), L"Bulk File Organizer", 19);
+        TextOutW(mdc, SX(98), SY(26), L"urFileManager", 19);
 
         // Sub header
         SetTextColor(mdc, t.textSub); SelectObject(mdc, g_fSub);
@@ -628,8 +641,13 @@ LRESULT CALLBACK EditSubclass(HWND h, UINT msg, WPARAM w, LPARAM l, UINT_PTR, DW
     case WM_MOUSEMOVE:
         if (!GetPropW(h, L"hov")) { SetPropW(h, L"hov", (HANDLE)TRUE); TRACKMOUSEEVENT t={sizeof(t),TME_LEAVE,h,0}; TrackMouseEvent(&t); RECT r={SX(35),SY(115),SX(575),SY(143)}; InvalidateRect(GetParent(h),&r,FALSE); }
         break;
-    case WM_MOUSELEAVE: SetPropW(h, L"hov", (HANDLE)FALSE); RECT r={SX(35),SY(115),SX(575),SY(143)}; InvalidateRect(GetParent(h),&r,FALSE); break;
-    case WM_SETFOCUS: case WM_KILLFOCUS: RECT r={SX(35),SY(115),SX(575),SY(143)}; InvalidateRect(GetParent(h),&r,FALSE); break;
+    case WM_MOUSELEAVE: {
+        SetPropW(h, L"hov", (HANDLE)FALSE); RECT r={SX(35),SY(115),SX(575),SY(143)}; InvalidateRect(GetParent(h),&r,FALSE); break;
+    }
+    case WM_SETFOCUS:
+    case WM_KILLFOCUS: {
+        RECT r={SX(35),SY(115),SX(575),SY(143)}; InvalidateRect(GetParent(h),&r,FALSE); break;
+    }
     }
     return DefSubclassProc(h, msg, w, l);
 }
@@ -637,67 +655,297 @@ LRESULT CALLBACK EditSubclass(HWND h, UINT msg, WPARAM w, LPARAM l, UINT_PTR, DW
 LRESULT CALLBACK ReportProc(HWND h, UINT msg, WPARAM w, LPARAM l) {
     switch (msg) {
     case WM_CREATE: {
-        int d=GetWindowDPI(h); double s=(double)d/96.0;
-        HWND hl = CreateWindowExW(0, WC_LISTVIEWW, L"", WS_CHILD|WS_VISIBLE|LVS_REPORT|LVS_SINGLESEL,
-            (int)(15*s), (int)(50*s), (int)(600*s), (int)(360*s), h, (HMENU)IDC_REPORT_LIST, GetModuleHandle(NULL), NULL);
-        HFONT hf = CreateFontW(-(int)(13*s),0,0,0,FW_NORMAL,0,0,0,DEFAULT_CHARSET,0,0,0,0,L"Segoe UI");
-        SendMessage(hl, WM_SETFONT, (WPARAM)hf, TRUE); SetPropW(h, L"lf", (HANDLE)hf);
-        LVCOLUMNW lv={}; lv.mask=LVCF_TEXT|LVCF_WIDTH|LVCF_SUBITEM;
-        lv.cx=(int)(200*s); lv.pszText=(LPWSTR)L"File Name"; ListView_InsertColumn(hl,0,&lv);
-        lv.cx=(int)(100*s); lv.pszText=(LPWSTR)L"Category"; ListView_InsertColumn(hl,1,&lv);
-        lv.cx=(int)(90*s); lv.pszText=(LPWSTR)L"Size"; ListView_InsertColumn(hl,2,&lv);
-        lv.cx=(int)(120*s); lv.pszText=(LPWSTR)L"Status"; ListView_InsertColumn(hl,3,&lv);
-        auto* f = (std::vector<MovedFileInfo>*)GetPropW(h, L"files");
-        if (f) for (size_t i=0; i<f->size(); ++i) {
-            const auto& fi = (*f)[i];
-            LVITEMW li={}; li.mask=LVIF_TEXT; li.iItem=(int)i; li.iSubItem=0;
-            li.pszText=const_cast<LPWSTR>(fi.fileName.c_str()); ListView_InsertItem(hl, &li);
-            ListView_SetItemText(hl,(int)i,1,const_cast<LPWSTR>(fi.category.c_str()));
-            std::wstring sz = FormatSize(fi.fileSize);
-            ListView_SetItemText(hl,(int)i,2,const_cast<LPWSTR>(sz.c_str()));
-            ListView_SetItemText(hl,(int)i,3,const_cast<LPWSTR>(fi.status.c_str()));
+        CREATESTRUCT* cs = (CREATESTRUCT*)l;
+        ReportData* rd = (ReportData*)cs->lpCreateParams;
+        int dpi = GetWindowDPI(h); double s = (double)dpi / 96.0;
+        const auto& t = g_themes[g_themeIdx];
+
+        // Summary label
+        std::wstring summary;
+        if (rd && rd->files && rd->srcDir) {
+            size_t ok=0, err=0, dry=0;
+            for (const auto& f : *rd->files) {
+                if (f.status == L"Dry Run Preview") dry++;
+                else if (f.status.find(L"Error") != std::wstring::npos) err++;
+                else ok++;
+            }
+            summary = L"Source: " + *rd->srcDir;
+            summary += L"  |  Total: " + std::to_wstring(rd->files->size());
+            summary += L"  |  OK: " + std::to_wstring(ok);
+            summary += L"  |  Errors: " + std::to_wstring(err);
+            summary += L"  |  Dry-Run: " + std::to_wstring(dry);
+        } else {
+            summary = L"No report data available.";
         }
-        std::wstring* sd = (std::wstring*)GetPropW(h, L"src");
-        if (sd && f) {
-            size_t s=0,e=0,d=0; for (const auto& fi : *f) { if (fi.status==L"Dry Run Preview") d++; else if (fi.status.find(L"Error")!=std::wstring::npos) e++; else s++; }
-            std::wstring sm = L"Source: " + *sd + L"  |  Total: " + std::to_wstring(f->size()) + L"  |  OK: " + std::to_wstring(s) + L"  |  Errors: " + std::to_wstring(e) + L"  |  Dry-Run: " + std::to_wstring(d);
-            HWND hs = CreateWindowExW(0, L"STATIC", sm.c_str(), WS_CHILD|WS_VISIBLE, (int)(15*s), (int)(15*s), (int)(600*s), (int)(30*s), h, NULL, GetModuleHandle(NULL), NULL);
-            SendMessage(hs, WM_SETFONT, (WPARAM)hf, TRUE);
+
+        HFONT hTitleFont = CreateFontW(-(int)(20*s),0,0,0,FW_BOLD,0,0,0,DEFAULT_CHARSET,0,0,0,0,L"Segoe UI");
+        HFONT hBodyFont = CreateFontW(-(int)(13*s),0,0,0,FW_NORMAL,0,0,0,DEFAULT_CHARSET,0,0,0,0,L"Segoe UI");
+        HFONT hBoldFont = CreateFontW(-(int)(13*s),0,0,0,FW_BOLD,0,0,0,DEFAULT_CHARSET,0,0,0,0,L"Segoe UI");
+        SetPropW(h, L"hTitleFont", (HANDLE)hTitleFont);
+        SetPropW(h, L"hBodyFont", (HANDLE)hBodyFont);
+        SetPropW(h, L"hBoldFont", (HANDLE)hBoldFont);
+
+        // Title
+        HWND hTitle = CreateWindowExW(0, L"STATIC", L"Organization Report",
+            WS_CHILD|WS_VISIBLE|SS_LEFT, (int)(15*s),(int)(10*s),(int)(500*s),(int)(25*s),
+            h, NULL, GetModuleHandle(NULL), NULL);
+        SendMessage(hTitle, WM_SETFONT, (WPARAM)hTitleFont, TRUE);
+
+        // Summary
+        HWND hSummary = CreateWindowExW(0, L"STATIC", summary.c_str(),
+            WS_CHILD|WS_VISIBLE|SS_LEFT, (int)(15*s),(int)(38*s),(int)(600*s),(int)(30*s),
+            h, NULL, GetModuleHandle(NULL), NULL);
+        SendMessage(hSummary, WM_SETFONT, (WPARAM)hBodyFont, TRUE);
+        SetPropW(h, L"hSummary", (HANDLE)hSummary);
+
+        // ListView
+        HWND hl = CreateWindowExW(WS_EX_CLIENTEDGE, WC_LISTVIEWW, L"",
+            WS_CHILD|WS_VISIBLE|WS_BORDER|LVS_REPORT|LVS_SINGLESEL|LVS_SHOWSELALWAYS,
+            (int)(15*s),(int)(72*s),(int)(600*s),(int)(340*s),
+            h, (HMENU)IDC_REPORT_LIST, GetModuleHandle(NULL), NULL);
+        SendMessage(hl, WM_SETFONT, (WPARAM)hBodyFont, TRUE);
+
+        // ListView extended styles
+        ListView_SetExtendedListViewStyle(hl, LVS_EX_FULLROWSELECT|LVS_EX_GRIDLINES|LVS_EX_DOUBLEBUFFER);
+
+        // ListView columns
+        LVCOLUMNW lv={}; lv.mask=LVCF_TEXT|LVCF_WIDTH|LVCF_SUBITEM|LVCF_FMT;
+        lv.cx=(int)(210*s); lv.pszText=(LPWSTR)L"File Name"; lv.fmt=LVCFMT_LEFT;  ListView_InsertColumn(hl,0,&lv);
+        lv.cx=(int)(100*s); lv.pszText=(LPWSTR)L"Category"; lv.fmt=LVCFMT_LEFT;  ListView_InsertColumn(hl,1,&lv);
+        lv.cx=(int)(80*s);  lv.pszText=(LPWSTR)L"Size";     lv.fmt=LVCFMT_RIGHT; ListView_InsertColumn(hl,2,&lv);
+        lv.cx=(int)(120*s); lv.pszText=(LPWSTR)L"Status";   lv.fmt=LVCFMT_LEFT;  ListView_InsertColumn(hl,3,&lv);
+
+        // Populate list items
+        if (rd && rd->files) {
+            for (size_t i = 0; i < rd->files->size(); ++i) {
+                const auto& fi = (*rd->files)[i];
+                LVITEMW li={}; li.mask=LVIF_TEXT|LVIF_PARAM; li.iItem=(int)i; li.iSubItem=0; li.lParam=(LPARAM)i;
+                li.pszText=const_cast<LPWSTR>(fi.fileName.c_str());
+                ListView_InsertItem(hl, &li);
+                ListView_SetItemText(hl,(int)i,1,const_cast<LPWSTR>(fi.category.c_str()));
+                std::wstring sz = FormatSizeW(fi.fileSize);
+                ListView_SetItemText(hl,(int)i,2,const_cast<LPWSTR>(sz.c_str()));
+                ListView_SetItemText(hl,(int)i,3,const_cast<LPWSTR>(fi.status.c_str()));
+            }
         }
-        CreateWindowExW(0, L"BUTTON", L"Save as PDF...", WS_CHILD|WS_VISIBLE, (int)(15*s),(int)(425*s),(int)(120*s),(int)(30*s), h, (HMENU)IDC_SAVE_PDF_BTN, GetModuleHandle(NULL), NULL);
-        CreateWindowExW(0, L"BUTTON", L"Close", WS_CHILD|WS_VISIBLE, (int)(145*s),(int)(425*s),(int)(90*s),(int)(30*s), h, (HMENU)IDC_CLOSE_REPORT_BTN, GetModuleHandle(NULL), NULL);
+
+        // Store data pointer on window
+        SetPropW(h, L"files", (HANDLE)rd->files);
+        SetPropW(h, L"src", (HANDLE)rd->srcDir);
+        SetPropW(h, L"dryRun", (HANDLE)(INT_PTR)(rd->dryRun ? 1 : 0));
+
+        // Save as PDF button
+        HWND hSave = CreateWindowExW(0, L"BUTTON", L"Save as PDF...",
+            WS_CHILD|WS_VISIBLE|BS_PUSHBUTTON, (int)(15*s),(int)(425*s),(int)(130*s),(int)(30*s),
+            h, (HMENU)IDC_SAVE_PDF_BTN, GetModuleHandle(NULL), NULL);
+        SendMessage(hSave, WM_SETFONT, (WPARAM)hBoldFont, TRUE);
+        SetWindowSubclass(hSave, BtnSubclass, IDC_SAVE_PDF_BTN, 1);
+
+        // Close button
+        HWND hClose = CreateWindowExW(0, L"BUTTON", L"Close",
+            WS_CHILD|WS_VISIBLE|BS_PUSHBUTTON, (int)(155*s),(int)(425*s),(int)(100*s),(int)(30*s),
+            h, (HMENU)IDC_CLOSE_REPORT_BTN, GetModuleHandle(NULL), NULL);
+        SendMessage(hClose, WM_SETFONT, (WPARAM)hBoldFont, TRUE);
+        SetWindowSubclass(hClose, BtnSubclass, IDC_CLOSE_REPORT_BTN, 0);
+
         break;
     }
+
+    case WM_CTLCOLORSTATIC: {
+        HDC hdc = (HDC)w; HWND hCtrl = (HWND)l;
+        const auto& t = g_themes[g_themeIdx];
+        SetTextColor(hdc, t.textNormal);
+        SetBkColor(hdc, t.cardBg);
+        return (INT_PTR)g_bCard;
+    }
+
+    case WM_CTLCOLORBTN: {
+        HDC hdc = (HDC)w; HWND hCtrl = (HWND)l;
+        const auto& t = g_themes[g_themeIdx];
+        SetTextColor(hdc, t.textNormal);
+        SetBkColor(hdc, t.cardBg);
+        return (INT_PTR)g_bCard;
+    }
+
+    case WM_CTLCOLOREDIT: {
+        HDC hdc = (HDC)w;
+        const auto& t = g_themes[g_themeIdx];
+        SetTextColor(hdc, t.textNormal);
+        SetBkColor(hdc, t.logBg);
+        return (INT_PTR)g_bLog;
+    }
+
     case WM_COMMAND: {
         int id = LOWORD(w);
-        if (id == IDC_CLOSE_REPORT_BTN) DestroyWindow(h);
-        else if (id == IDC_SAVE_PDF_BTN) {
+        if (id == IDC_CLOSE_REPORT_BTN) {
+            DestroyWindow(h);
+        } else if (id == IDC_SAVE_PDF_BTN) {
             auto* f = (std::vector<MovedFileInfo>*)GetPropW(h, L"files");
             auto* sd = (std::wstring*)GetPropW(h, L"src");
+            bool dry = (INT_PTR)GetPropW(h, L"dryRun") == 1;
             if (f && sd && !f->empty()) {
                 wchar_t p[MAX_PATH]={}; OPENFILENAMEW ofn={}; ofn.lStructSize=sizeof(ofn); ofn.hwndOwner=h;
                 ofn.lpstrFilter=L"PDF Files\0*.pdf\0All Files\0*.*\0"; ofn.lpstrFile=p; ofn.nMaxFile=MAX_PATH;
                 ofn.lpstrDefExt=L"pdf"; ofn.Flags=OFN_OVERWRITEPROMPT|OFN_HIDEREADONLY;
-                wcscpy_s(p, L"organization_report.pdf");
+                std::wstring defName = dry ? L"organization_report_preview.pdf" : L"organization_report.pdf";
+                wcscpy_s(p, defName.c_str());
                 if (GetSaveFileNameW(&ofn)) {
-                    try {
-                        std::string pa(p, p+wcslen(p));
-                        std::string sa((*sd).begin(),(*sd).end());
-                        std::vector<MovedFileInfo> mv;
-                        for (const auto& m : *f) mv.push_back({std::string(m.fileName.begin(),m.fileName.end()),
-                            std::string(m.category.begin(),m.category.end()), m.fileSize, std::string(m.status.begin(),m.status.end())});
-                        // Inline PDF gen would go here; for now just show success
-                        MessageBoxW(h, L"PDF report saved.", L"Done", MB_OK|MB_ICONINFORMATION);
-                    } catch (...) {
-                        MessageBoxW(h, L"Failed to save PDF.", L"Error", MB_OK|MB_ICONERROR);
+                    std::string savePath(p, p + wcslen(p));
+                    std::string targetFolder((*sd).begin(), (*sd).end());
+                    // Convert wstring MovedInfos to string-based for GeneratePDFReport
+                    std::vector<MovedFileInfoStr> converted;
+                    converted.reserve(f->size());
+                    for (const auto& m : *f) {
+                        MovedFileInfoStr rec;
+                        rec.fileName = std::string(m.fileName.begin(), m.fileName.end());
+                        rec.category = std::string(m.category.begin(), m.category.end());
+                        rec.fileSize = m.fileSize;
+                        rec.status = std::string(m.status.begin(), m.status.end());
+                        converted.push_back(rec);
                     }
+                    GeneratePDFReportStr(savePath, targetFolder, converted, dry);
+                    MessageBoxW(h, L"PDF report saved successfully.", L"Export Complete", MB_OK|MB_ICONINFORMATION);
                 }
             }
         }
         break;
     }
+
+    case WM_PAINT: {
+        PAINTSTRUCT ps; HDC hdc = BeginPaint(h, &ps);
+        RECT rc; GetClientRect(h, &rc);
+        int w = rc.right-rc.left, ch = rc.bottom-rc.top;
+        const auto& t = g_themes[g_themeIdx];
+        int dpi = GetWindowDPI(h); double sc = (double)dpi / 96.0;
+
+        HDC mdc = CreateCompatibleDC(hdc); HBITMAP mb = CreateCompatibleBitmap(hdc, w, ch); HBITMAP ob = (HBITMAP)SelectObject(mdc, mb);
+        FillRect(mdc, &rc, g_bCard);
+
+        // Top accent line
+        RECT accentLine = {0, 0, w, (int)(3*sc)};
+        HBRUSH hAccent = CreateSolidBrush(t.accent);
+        FillRect(mdc, &accentLine, hAccent); DeleteObject(hAccent);
+
+        BitBlt(hdc, 0, 0, w, ch, mdc, 0, 0, SRCCOPY);
+        SelectObject(mdc, ob); DeleteObject(mb); DeleteDC(mdc);
+        EndPaint(h, &ps); return 0;
+    }
+
     case WM_CLOSE: DestroyWindow(h); break;
-    case WM_DESTROY: HFONT hf=(HFONT)RemovePropW(h,L"lf"); if(hf) DeleteObject(hf); RemovePropW(h,L"files"); RemovePropW(h,L"src"); break;
+
+    case WM_DESTROY: {
+        HFONT hf1=(HFONT)RemovePropW(h,L"hTitleFont");
+        HFONT hf2=(HFONT)RemovePropW(h,L"hBodyFont");
+        HFONT hf3=(HFONT)RemovePropW(h,L"hBoldFont");
+        if(hf1)DeleteObject(hf1); if(hf2)DeleteObject(hf2); if(hf3)DeleteObject(hf3);
+        RemovePropW(h,L"files"); RemovePropW(h,L"src"); RemovePropW(h,L"dryRun"); RemovePropW(h,L"hSummary");
+        break;
+    }
     }
     return DefWindowProcW(h, msg, w, l);
+}
+
+std::string EscapePDFStr(const std::string& text) {
+    std::string s;
+    for (char c : text) {
+        if ((unsigned char)c < 128) {
+            if (c == '(' || c == ')' || c == '\\') s += '\\';
+            s += c;
+        } else s += '?';
+    }
+    return s;
+}
+std::string TruncStr(const std::string& t, size_t m) { return t.length() <= m ? t : t.substr(0,m-3)+"..."; }
+std::string FmtSizeStr(uint64_t b) {
+    double sz=(double)b; const char* u="B";
+    if(sz>=1024){sz/=1024;u="KB";} if(sz>=1024){sz/=1024;u="MB";} if(sz>=1024){sz/=1024;u="GB";}
+    char buf[32]; snprintf(buf,sizeof(buf),"%.2f %s",sz,u); return buf;
+}
+
+void GeneratePDFReportStr(const std::string& outputPath, const std::string& targetFolder,
+                          const std::vector<MovedFileInfoStr>& movedFiles, bool dryRun) {
+    if (movedFiles.empty()) return;
+    uint64_t totalSize = 0;
+    for (const auto& f : movedFiles) if (f.status.find("Error") == std::string::npos) totalSize += f.fileSize;
+    std::string totalSizeStr = FmtSizeStr(totalSize);
+    const size_t rpf = 25, rps = 32;
+    size_t total = movedFiles.size(), pc = 1;
+    if (total > rpf) pc = 1 + (total - rpf + rps - 1) / rps;
+
+    auto now = std::chrono::system_clock::now();
+    auto in_t = std::chrono::system_clock::to_time_t(now);
+    std::tm tm;
+#ifdef _WIN32
+    localtime_s(&tm, &in_t);
+#else
+    localtime_r(&in_t, &tm);
+#endif
+    char tb[64]; strftime(tb, sizeof(tb), "%Y-%m-%d %H:%M:%S", &tm);
+
+    std::vector<std::string> contents;
+    size_t fi = 0;
+    for (size_t p = 0; p < pc; ++p) {
+        std::stringstream ss;
+        ss << "0.9 0.9 0.9 RG 0.5 w 30 30 535 782 re S\n";
+        size_t sy;
+        if (p == 0) {
+            ss << "0.95 0.95 0.98 rg 40 700 515 100 re f\n0.85 0.85 0.9 RG 1 w 40 700 515 100 re S\n";
+            ss << "BT /F2 18 Tf 0.1 0.1 0.25 rg 55 765 Td (" << (dryRun?"urFileManager - DRY RUN REPORT":"urFileManager - File Transfer Report") << ") Tj ET\n";
+            ss << "BT /F1 9 Tf 0.35 0.35 0.45 rg 55 745 Td (Report generated: " << EscapePDFStr(tb) << ") Tj ET\n";
+            ss << "BT /F1 9 Tf 0.35 0.35 0.45 rg 55 730 Td (Target: " << EscapePDFStr(targetFolder) << ") Tj ET\n";
+            ss << "BT /F2 10 Tf 0.15 0.5 0.15 rg 55 712 Td (Status: " << (dryRun?"PREVIEW":"COMPLETED") << "  |  Total: " << total << "  |  Size: " << EscapePDFStr(totalSizeStr) << ") Tj ET\n";
+            ss << "0.9 0.9 0.92 rg 40 655 515 22 re f\n0.7 0.7 0.75 RG 1 w 40 655 515 22 re S\n";
+            ss << "BT /F2 9 Tf 0.15 0.15 0.2 rg 48 662 Td (File Name) Tj ET\n";
+            ss << "BT /F2 9 Tf 0.15 0.15 0.2 rg 268 662 Td (Category) Tj ET\n";
+            ss << "BT /F2 9 Tf 0.15 0.15 0.2 rg 368 662 Td (Size) Tj ET\n";
+            ss << "BT /F2 9 Tf 0.15 0.15 0.2 rg 458 662 Td (Status) Tj ET\n";
+            sy = 655;
+        } else {
+            ss << "0.9 0.9 0.92 rg 40 770 515 22 re f\n0.7 0.7 0.75 RG 1 w 40 770 515 22 re S\n";
+            ss << "BT /F2 9 Tf 0.15 0.15 0.2 rg 48 777 Td (File Name) Tj ET\n";
+            ss << "BT /F2 9 Tf 0.15 0.15 0.2 rg 268 777 Td (Category) Tj ET\n";
+            ss << "BT /F2 9 Tf 0.15 0.15 0.2 rg 368 777 Td (Size) Tj ET\n";
+            ss << "BT /F2 9 Tf 0.15 0.15 0.2 rg 458 777 Td (Status) Tj ET\n";
+            sy = 770;
+        }
+        size_t items = (p==0)?rpf:rps, drawn=0;
+        for (size_t r=0; r<items && fi<total; ++r, ++fi) {
+            const auto& f = movedFiles[fi]; size_t ry = sy-20-(r*20); drawn++;
+            if (r%2==1) ss << "0.97 0.97 0.99 rg 40 " << ry << " 515 20 re f\n";
+            ss << "0.9 0.9 0.9 RG 0.5 w 40 " << ry << " m 555 " << ry << " l S\n";
+            size_t ty = ry+6;
+            ss << "BT /F1 9 Tf 0.15 0.15 0.15 rg 48 " << ty << " Td (" << EscapePDFStr(TruncStr(f.fileName,38)) << ") Tj ET\n";
+            ss << "BT /F1 9 Tf 0.15 0.15 0.15 rg 268 " << ty << " Td (" << EscapePDFStr(TruncStr(f.category,15)) << ") Tj ET\n";
+            ss << "BT /F1 9 Tf 0.15 0.15 0.15 rg 368 " << ty << " Td (" << EscapePDFStr(FmtSizeStr(f.fileSize)) << ") Tj ET\n";
+            if (f.status=="Moved") ss << "BT /F2 9 Tf 0.1 0.5 0.1 rg 458 " << ty << " Td (Moved) Tj ET\n";
+            else if (f.status.find("Renamed")!=std::string::npos) ss << "BT /F2 9 Tf 0.8 0.4 0.0 rg 458 " << ty << " Td (Renamed) Tj ET\n";
+            else if (f.status.find("Error")!=std::string::npos) ss << "BT /F2 9 Tf 0.8 0.1 0.1 rg 458 " << ty << " Td (Error) Tj ET\n";
+            else ss << "BT /F1 9 Tf 0.2 0.2 0.7 rg 458 " << ty << " Td (" << EscapePDFStr(f.status) << ") Tj ET\n";
+        }
+        size_t fy = sy-20-(drawn*20);
+        ss << "0.85 0.85 0.85 RG 0.5 w 40 " << fy << " m 40 " << sy << " l S\n";
+        ss << "0.85 0.85 0.85 RG 0.5 w 260 " << fy << " m 260 " << sy << " l S\n";
+        ss << "0.85 0.85 0.85 RG 0.5 w 360 " << fy << " m 360 " << sy << " l S\n";
+        ss << "0.85 0.85 0.85 RG 0.5 w 450 " << fy << " m 450 " << sy << " l S\n";
+        ss << "0.85 0.85 0.85 RG 0.5 w 555 " << fy << " m 555 " << sy << " l S\n";
+        ss << "0.7 0.7 0.75 RG 1 w 40 " << fy << " m 555 " << fy << " l S\n";
+        ss << "BT /F1 8 Tf 0.5 0.5 0.5 rg 270 45 Td (Page " << (p+1) << " of " << pc << ") Tj ET\n";
+        contents.push_back(ss.str());
+    }
+    std::vector<std::string> objs;
+    objs.push_back("<< /Type /Catalog /Pages 2 0 R >>");
+    std::string kids; for(size_t p=0;p<pc;++p) kids+=std::to_string(5+p)+" 0 R ";
+    objs.push_back("<< /Type /Pages /Kids ["+kids+"] /Count "+std::to_string(pc)+" >>");
+    objs.push_back("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>");
+    objs.push_back("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>");
+    for(size_t p=0;p<pc;++p) objs.push_back("<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents "+std::to_string(5+pc+p)+" 0 R >>");
+    for(size_t p=0;p<pc;++p) { const auto& c=contents[p]; objs.push_back("<< /Length "+std::to_string(c.length())+" >>\nstream\n"+c+"\nendstream"); }
+    std::ofstream out(outputPath, std::ios::binary);
+    if(!out.is_open()) return;
+    out<<"%PDF-1.4\n"; std::vector<size_t> off; size_t o=9;
+    for(size_t i=0;i<objs.size();++i){off.push_back(o);std::string s=std::to_string(i+1)+" 0 obj\n"+objs[i]+"\nendobj\n";out.write(s.c_str(),s.length());o+=s.length();}
+    size_t xref=o; out<<"xref\n0 "<<(objs.size()+1)<<"\n";
+    char bf[64]; snprintf(bf,sizeof(bf),"%010d 65535 f\r\n",0); out.write(bf,strlen(bf));
+    for(size_t ox:off){snprintf(bf,sizeof(bf),"%010zu 00000 n\r\n",ox);out.write(bf,strlen(bf));}
+    out<<"trailer\n<< /Size "<<(objs.size()+1)<<" /Root 1 0 R >>\nstartxref\n"<<xref<<"\n%%EOF\n";
 }

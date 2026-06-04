@@ -4,7 +4,7 @@ const steps = [
   {
     num: '01',
     title: 'Pick a folder',
-    description: 'Launch urFiles and select any cluttered directory — Downloads, Desktop, or a project folder.',
+    description: 'Launch urFileManager and select any cluttered directory — Downloads, Desktop, or a project folder.',
     code: 'organizer.exe → Browse folder',
   },
   {

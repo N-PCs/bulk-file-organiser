@@ -8,7 +8,7 @@
 set -euo pipefail
 
 echo "=============================================="
-echo "  urFiles - Linux Build"
+echo "  urFileManager (urFM) - Linux Build"
 echo "=============================================="
 echo ""
 
@@ -41,10 +41,10 @@ echo "[1/2] Compiling core module..."
 g++ -std=c++17 -O2 -c core.cpp -o core.o
 
 echo "[2/2] Compiling GUI + linking..."
-g++ -std=c++17 -O2 gui_fltk.cpp core.o -o urfiles $FLTK_FLAGS
+g++ -std=c++17 -O2 gui_fltk.cpp core.o -o urfm $FLTK_FLAGS
 
 echo ""
-echo "Build successful! Created 'urfiles'."
-echo "Run: ./urfiles <directory> [--dry-run]"
-echo "Or:  ./urfiles  (launches GUI)"
+echo "Build successful! Created 'urfm'."
+echo "Run: ./urfm <directory> [--dry-run]"
+echo "Or:  ./urfm  (launches GUI)"
 echo "=============================================="

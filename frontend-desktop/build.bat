@@ -1,7 +1,7 @@
 @echo off
 echo.
 echo =======================================================
-echo   urFiles - Windows C++ Win32 GUI Builder
+echo   urFileManager - Windows C++ Win32 GUI Builder
 echo =======================================================
 echo.
 

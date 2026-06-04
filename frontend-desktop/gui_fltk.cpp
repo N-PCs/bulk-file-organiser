@@ -1,5 +1,5 @@
-// gui_fltk.cpp - Cross-platform GUI for urFiles (Linux & macOS)
-// Build: g++ -std=c++17 -O2 gui_fltk.cpp core.cpp -o urfiles $(fltk-config --cxxflags --ldflags) -lpthread
+// gui_fltk.cpp - Cross-platform GUI for urFileManager (Linux & macOS)
+// Build: g++ -std=c++17 -O2 gui_fltk.cpp core.cpp -o urfm $(fltk-config --cxxflags --ldflags) -lpthread
 #include <FL/Fl.H>
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Box.H>
@@ -248,8 +248,8 @@ int main(int argc, char** argv) {
         }
 
         if (dir.empty()) {
-            std::cout << "urFiles CLI Organizer\n";
-            std::cout << "Usage: urfiles <directory> [--dry-run]\n";
+            std::cout << "urFileManager CLI Organizer\n";
+            std::cout << "Usage: urfm <directory> [--dry-run]\n";
             return 1;
         }
 
@@ -331,14 +331,14 @@ int main(int argc, char** argv) {
     std::string json = ReadFileToString(cfgPath);
     g_fileTypeMap = ParseConfig(json);
 
-    g_win = new Fl_Double_Window(740, 560, "urFiles - Bulk File Organizer");
+    g_win = new Fl_Double_Window(740, 560, "urFileManager");
     g_win->box(FL_FLAT_BOX);
 
     // Header
-    Fl_Box *title = new Fl_Box(FL_NO_BOX, 20, 15, 300, 30, "urFiles");
+    Fl_Box *title = new Fl_Box(FL_NO_BOX, 20, 15, 300, 30, "urFM");
     title->labelfont(FL_HELVETICA_BOLD);
     title->labelsize(26);
-    Fl_Box *subtitle = new Fl_Box(FL_NO_BOX, 150, 22, 400, 20, "Bulk File Organizer");
+    Fl_Box *subtitle = new Fl_Box(FL_NO_BOX, 90, 22, 400, 20, "urFileManager");
     subtitle->labelsize(13);
     subtitle->labelcolor(fl_lighter(FL_FOREGROUND_COLOR));
     Fl_Box *desc = new Fl_Box(FL_NO_BOX, 20, 48, 600, 20,
@@ -413,7 +413,7 @@ int main(int argc, char** argv) {
     if (g_fileTypeMap.empty()) {
         appendLog("[ERROR] config.json not found. Place it next to the executable.");
     } else {
-        appendLog("urFiles v1.0 - Bulk File Organizer");
+        appendLog("urFileManager v1.0");
         appendLog("Configuration loaded from config.json");
         appendLog("Select a folder and click Start Organizing.");
         appendLog("Dry-run mode is ON by default for safety.");

@@ -145,7 +145,7 @@ void GeneratePDFReport(const std::string& outputPath, const std::string& targetF
         if (p == 0) {
             ss << "0.95 0.95 0.98 rg 40 700 515 100 re f\n0.85 0.85 0.9 RG 1 w 40 700 515 100 re S\n";
             ss << "BT /F2 18 Tf 0.1 0.1 0.25 rg 55 765 Td ("
-               << (dryRun ? "urFiles - DRY RUN REPORT" : "urFiles - File Transfer Report")
+               << (dryRun ? "urFileManager - DRY RUN REPORT" : "urFileManager - File Transfer Report")
                << ") Tj ET\n";
             ss << "BT /F1 9 Tf 0.35 0.35 0.45 rg 55 745 Td (Report generated on: " << EscapePDFText(timeBuf) << ") Tj ET\n";
             ss << "BT /F1 9 Tf 0.35 0.35 0.45 rg 55 730 Td (Target Folder: " << EscapePDFText(targetFolder) << ") Tj ET\n";

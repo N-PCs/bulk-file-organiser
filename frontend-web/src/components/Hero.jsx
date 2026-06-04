@@ -75,13 +75,13 @@ export default function Hero() {
     <section className="hero">
       <div className="container hero-layout">
         <div className="hero-copy">
-          <p className="hero-eyebrow">Bulk file organizer for Windows</p>
+          <p className="hero-eyebrow">Cross-platform file organizer</p>
           <h1 className="hero-title">
             Turn a messy folder into{' '}
             <span className="hero-gradient">organized categories</span>
           </h1>
           <p className="hero-description">
-            Point urFiles at any cluttered directory — like Downloads — and it moves
+            Point urFileManager at any cluttered directory — like Downloads — and it moves
             every loose file into subfolders by type. Images, Documents, Audio, Video,
             and Archives are created automatically. Preview with dry-run before anything moves.
           </p>
@@ -108,7 +108,7 @@ export default function Hero() {
             <span className="demo-dot" />
             <span className="demo-dot" />
             <span className="demo-dot" />
-            <span className="demo-title">urFiles — Downloads</span>
+            <span className="demo-title">urFileManager — Downloads</span>
           </div>
 
           <div className="demo-body">

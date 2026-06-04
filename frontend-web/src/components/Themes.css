@@ -81,12 +81,6 @@
   transition: color 0.3s ease;
 }
 
-.themes-showcase .theme-card:last-child {
-  grid-column: span 2;
-  max-width: calc(50% - 8px);
-  justify-self: center;
-}
-
 @media (max-width: 860px) {
   .themes-layout {
     grid-template-columns: 1fr;

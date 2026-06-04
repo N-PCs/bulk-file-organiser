@@ -5,8 +5,8 @@ export default function Footer() {
     <footer className="footer">
       <div className="container footer-inner">
         <div className="footer-brand">
-          <span className="footer-logo">urFiles</span>
-          <p className="footer-tagline">Smart file organization for Windows.</p>
+          <span className="footer-logo">urFM</span>
+          <p className="footer-tagline">Smart file organization for all platforms.</p>
         </div>
 
         <div className="footer-links">
@@ -17,7 +17,7 @@ export default function Footer() {
         </div>
 
         <p className="footer-copy">
-          © {new Date().getFullYear()} urFiles. Native C++, fully offline, no tracking.
+          © {new Date().getFullYear()} urFileManager. Native C++, fully offline, no tracking.
         </p>
       </div>
     </footer>

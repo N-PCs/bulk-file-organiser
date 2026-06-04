@@ -1,20 +1,20 @@
-# Package urFiles for Windows download
+# Package urFileManager for Windows download
 # Run from project root: .\scripts\package-release.ps1
 
 $ErrorActionPreference = "Stop"
 $Root = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
-$ReleaseDir = Join-Path $Root "release"
-$PublicDir = Join-Path $Root "website\public"
-$ZipName = "urFiles-windows.zip"
+$DesktopDir = Join-Path $Root "frontend-desktop"
+$PublicDir = Join-Path $Root "frontend-web\public"
+$ZipName = "urfm-windows.zip"
 $ZipPath = Join-Path $PublicDir $ZipName
 
-Write-Host "=== urFiles Release Packager ===" -ForegroundColor Cyan
+Write-Host "=== urFileManager Release Packager ===" -ForegroundColor Cyan
 
 # Build if organizer.exe missing
-$ExePath = Join-Path $Root "organizer.exe"
+$ExePath = Join-Path $DesktopDir "organizer.exe"
 if (-not (Test-Path $ExePath)) {
     Write-Host "organizer.exe not found. Running build.bat..." -ForegroundColor Yellow
-    Push-Location $Root
+    Push-Location $DesktopDir
     & cmd /c "build.bat"
     Pop-Location
     if (-not (Test-Path $ExePath)) {
@@ -23,7 +23,7 @@ if (-not (Test-Path $ExePath)) {
 }
 
 # Prepare staging folder
-$Stage = Join-Path $env:TEMP "urFiles-stage-$(Get-Random)"
+$Stage = Join-Path $env:TEMP "urfm-stage-$(Get-Random)"
 New-Item -ItemType Directory -Path $Stage -Force | Out-Null
 
 $Files = @(
@@ -35,7 +35,11 @@ $Files = @(
 )
 
 foreach ($f in $Files) {
-    $src = Join-Path $Root $f.Src
+    $src = Join-Path $DesktopDir $f.Src
+    if (-not (Test-Path $src)) {
+        # Fallback to root
+        $src = Join-Path $Root $f.Src
+    }
     if (-not (Test-Path $src)) {
         Write-Error "Missing required file: $($f.Src)"
     }

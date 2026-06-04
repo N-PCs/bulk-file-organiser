@@ -1,7 +1,7 @@
 # organizer.py
 
 """
-Bulk File Organizer
+urFileManager (Python CLI)
 
 This script provides a command-line utility to organize files within a specified
 directory into subdirectories based on their file type. It supports a dry-run
@@ -121,7 +121,7 @@ def generate_pdf_report(report_path: pathlib.Path, moved_files: list, dry_run: b
             ss.append("0.85 0.85 0.9 RG 1 w 40 700 515 100 re S\n")
 
             # Title Text
-            title = "urFiles - DRY RUN REPORT" if dry_run else "urFiles - File Transfer Report"
+            title = "urFileManager - DRY RUN REPORT" if dry_run else "urFileManager - File Transfer Report"
             ss.append(f"BT /F2 18 Tf 0.1 0.1 0.25 rg 55 765 Td ({escape_pdf_text(title)}) Tj ET\n")
 
             # Metadata Lines
