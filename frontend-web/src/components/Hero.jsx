@@ -95,10 +95,10 @@ export default function Hero() {
           <div className="hero-actions">
             <a href="#download" className="btn btn-primary btn-lg">
               <IconWindows className="btn-icon" />
-              Download for Windows
+              Download urFM
             </a>
-            <a href="#features" className="btn btn-secondary btn-lg">
-              View features
+            <a href="#download" className="btn btn-secondary btn-lg">
+              CLI install commands
             </a>
           </div>
         </div>

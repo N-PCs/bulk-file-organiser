@@ -30,7 +30,7 @@ foreach ($f in @("organizer.exe", "run.bat", "organizer.bat")) {
     Copy-Item (Join-Path $DesktopDir $f) $WinStage
 }
 Copy-Item $ConfigFile $WinStage
-Copy-Item (Join-Path $DesktopDir "release\README.txt") (Join-Path $WinStage "README.txt")
+Copy-Item (Join-Path $DesktopDir "RELEASE_README.txt") (Join-Path $WinStage "README.txt")
 
 $WinZip = Join-Path $PublicDir "urfm-windows.zip"
 if (Test-Path $WinZip) { Remove-Item $WinZip -Force }
@@ -47,7 +47,7 @@ foreach ($f in @("core.cpp", "core.h", "gui_fltk.cpp", "build.sh")) {
     Copy-Item (Join-Path $DesktopDir $f) $LinuxStage
 }
 Copy-Item $ConfigFile $LinuxStage
-Copy-Item (Join-Path $DesktopDir "release\README.txt") (Join-Path $LinuxStage "README.txt")
+Copy-Item (Join-Path $DesktopDir "RELEASE_README.txt") (Join-Path $LinuxStage "README.txt")
 
 $LinuxTar = Join-Path $PublicDir "urfm-linux.tar.gz"
 Push-Location $LinuxStage
@@ -64,7 +64,7 @@ foreach ($f in @("core.cpp", "core.h", "gui_fltk.cpp", "build_mac.sh")) {
     Copy-Item (Join-Path $DesktopDir $f) $MacStage
 }
 Copy-Item $ConfigFile $MacStage
-Copy-Item (Join-Path $DesktopDir "release\README.txt") (Join-Path $MacStage "README.txt")
+Copy-Item (Join-Path $DesktopDir "RELEASE_README.txt") (Join-Path $MacStage "README.txt")
 
 $MacTar = Join-Path $PublicDir "urfm-macos.tar.gz"
 Push-Location $MacStage
@@ -72,5 +72,18 @@ tar -czf $MacTar *
 Pop-Location
 Remove-Item $MacStage -Recurse -Force
 Write-Host "  Created: urfm-macos.tar.gz" -ForegroundColor Green
+
+# ── Manifest for the website ───────────────────────────────────────────
+$Manifest = @{
+    version = "1.0.0"
+    generated = (Get-Date -Format "yyyy-MM-ddTHH:mm:ssZ")
+    files = @(
+        @{ name = "urfm-windows.zip"; platform = "windows"; size = (Get-Item (Join-Path $PublicDir "urfm-windows.zip")).Length }
+        @{ name = "urfm-linux.tar.gz"; platform = "linux"; size = (Get-Item (Join-Path $PublicDir "urfm-linux.tar.gz")).Length }
+        @{ name = "urfm-macos.tar.gz"; platform = "mac"; size = (Get-Item (Join-Path $PublicDir "urfm-macos.tar.gz")).Length }
+    )
+}
+$Manifest | ConvertTo-Json -Depth 3 | Set-Content (Join-Path $PublicDir "downloads.json") -Encoding UTF8
+Write-Host "  Created: downloads.json" -ForegroundColor Green
 
 Write-Host "`n=== All platform packages created ===" -ForegroundColor Cyan

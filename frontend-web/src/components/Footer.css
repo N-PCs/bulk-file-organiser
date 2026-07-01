@@ -67,6 +67,15 @@
   border-top: 1px solid var(--border);
 }
 
+.footer-credit a {
+  color: var(--secondary);
+  font-weight: 600;
+}
+
+.footer-credit a:hover {
+  text-decoration: underline;
+}
+
 @media (max-width: 640px) {
   .footer-inner {
     grid-template-columns: 1fr;

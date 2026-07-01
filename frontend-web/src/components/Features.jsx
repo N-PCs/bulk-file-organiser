@@ -77,8 +77,8 @@ export default function Features() {
           <span className="section-label">Features</span>
           <h2 className="section-title">Built for reliable file organization</h2>
           <p className="section-subtitle">
-            A native Windows utility with no cloud dependency, no subscriptions, and no
-            external runtime required.
+            A native cross-platform utility with no cloud dependency, no subscriptions, and no
+            external runtime required on Windows.
           </p>
         </div>
 

@@ -5,13 +5,13 @@ const steps = [
     num: '01',
     title: 'Pick a folder',
     description: 'Launch urFileManager and select any cluttered directory — Downloads, Desktop, or a project folder.',
-    code: 'organizer.exe → Browse folder',
+    code: 'run.bat  ·  ./urfm  ·  organizer.bat <folder>',
   },
   {
     num: '02',
     title: 'Preview with dry-run',
     description: 'Review the planned moves in the live log console. Disable dry-run when you are ready to commit.',
-    code: 'Dry-run mode (default: ON)',
+    code: '--dry-run  (default: ON in GUI)',
   },
   {
     num: '03',

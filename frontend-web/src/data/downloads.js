@@ -1,0 +1,93 @@
+export const VERSION = '1.0.0'
+
+export const platforms = [
+  {
+    id: 'windows',
+    name: 'Windows',
+    zipName: 'urfm-windows.zip',
+    archiveType: 'zip',
+    description: 'Native Win32 GUI — no dependencies, no admin rights required.',
+    contents: [
+      'organizer.exe — Native Windows application',
+      'config.json — Customizable sorting rules',
+      'run.bat — Launch the GUI instantly',
+      'organizer.bat — CLI wrapper for scripting',
+      'README.txt — Quick start guide',
+    ],
+    note: 'Portable ZIP · Windows 10 or later · x64',
+    sysReqs: {
+      OS: 'Windows 10 / 11',
+      Architecture: '64-bit (x64)',
+      Dependencies: 'None',
+      'Install type': 'Portable',
+    },
+    usageCli: ['.\\run.bat', '.\\organizer.bat C:\\Downloads --dry-run'],
+  },
+  {
+    id: 'linux',
+    name: 'Linux',
+    zipName: 'urfm-linux.tar.gz',
+    archiveType: 'tarball',
+    description: 'FLTK-based GUI for all major distributions. Build from source.',
+    contents: [
+      'urfm — Native Linux binary (FLTK GUI + CLI)',
+      'config.json — Customizable sorting rules',
+      'build.sh — Build script for Fedora, Ubuntu, Arch',
+      'README.txt — Quick start guide',
+    ],
+    note: 'Source tarball · Fedora / Ubuntu / Arch · x64',
+    sysReqs: {
+      OS: 'Fedora / Ubuntu / Arch',
+      Architecture: '64-bit (x64)',
+      Dependencies: 'FLTK 1.3+',
+      'Install type': 'Build from source',
+    },
+    usageCli: [
+      'sudo apt install libfltk1.3-dev   # Ubuntu',
+      'sudo dnf install fltk-devel           # Fedora',
+      './build.sh && ./urfm ~/Downloads --dry-run',
+    ],
+  },
+  {
+    id: 'mac',
+    name: 'macOS',
+    zipName: 'urfm-macos.tar.gz',
+    archiveType: 'tarball',
+    description: 'Native macOS experience via FLTK. Requires Homebrew for dependencies.',
+    contents: [
+      'urfm — Native macOS binary (FLTK GUI + CLI)',
+      'config.json — Customizable sorting rules',
+      'build_mac.sh — Build script for macOS',
+      'README.txt — Quick start guide',
+    ],
+    note: 'Source tarball · macOS 11+ · x64 & Apple Silicon',
+    sysReqs: {
+      OS: 'macOS 11 (Big Sur)+',
+      Architecture: 'x64 & Apple Silicon',
+      Dependencies: 'FLTK (brew install fltk)',
+      'Install type': 'Build from source',
+    },
+    usageCli: ['brew install fltk', 'chmod +x build_mac.sh', './build_mac.sh && ./urfm ~/Downloads --dry-run'],
+  },
+]
+
+export function formatBytes(bytes) {
+  if (!bytes || bytes <= 0) return null
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+  return `${(bytes / (1024 * 1024)).toFixed(2)} MB`
+}
+
+export function getDownloadUrl(zipName, origin = '') {
+  const base = origin || (typeof window !== 'undefined' ? window.location.origin : '')
+  return `${base}/${zipName}`
+}
+
+export function getCliCommands(zipName, origin = '') {
+  const url = getDownloadUrl(zipName, origin)
+  return {
+    powershell: `Invoke-WebRequest -Uri "${url}" -OutFile "${zipName}"`,
+    cmd: `curl -L -o "${zipName}" "${url}"`,
+    bash: `curl -LO "${url}"`,
+    wget: `wget -O "${zipName}" "${url}"`,
+  }
+}

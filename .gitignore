@@ -47,6 +47,9 @@ release/
 frontend-web/node_modules/
 frontend-web/dist/
 
-# Archives
+# Archives (allow website release bundles in public/)
 *.zip
 *.tar.gz
+!frontend-web/public/urfm-windows.zip
+!frontend-web/public/urfm-linux.tar.gz
+!frontend-web/public/urfm-macos.tar.gz

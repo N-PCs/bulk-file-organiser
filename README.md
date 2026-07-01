@@ -43,7 +43,17 @@ A cross-platform, native C++ utility that organizes cluttered folders into categ
 
 ### Windows
 
-1. Download `urfm-windows.zip` from the website
+1. Download `urfm-windows.zip` from the [website](https://urfilemanager.vercel.app) or via CLI:
+
+```powershell
+# PowerShell
+Invoke-WebRequest -Uri "https://urfilemanager.vercel.app/urfm-windows.zip" -OutFile "urfm-windows.zip"
+```
+
+```cmd
+curl -L -o urfm-windows.zip "https://urfilemanager.vercel.app/urfm-windows.zip"
+```
+
 2. Extract anywhere
 3. Double-click `run.bat` to launch the GUI, or use:
 
@@ -112,7 +122,19 @@ pip install tqdm
 python organizer.py ~/Downloads
 ```
 
-## Contributor
+## Releasing (website downloads)
+
+Release archives must live in `frontend-web/public/` so Vite copies them into the deployed site.
+
+```powershell
+# From project root — builds Windows EXE if needed, packages all platforms
+.\scripts\package-release.ps1
+
+# Or from frontend-web/
+npm run release
+```
+
+Then commit `frontend-web/public/urfm-*.zip`, `urfm-*.tar.gz`, and `downloads.json`, and push to redeploy.
 
 Made with ❤️ by @N-PCs 
 
