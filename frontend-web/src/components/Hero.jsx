@@ -1,75 +1,124 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import './Hero.css'
-import { IconWindows, IconFolder, IconFile, IconDocuments, IconImage, IconAudio, IconVideo } from './Icons'
+import {
+  IconWindows,
+  IconFolder,
+  IconFile,
+  IconShield,
+  IconSort,
+  IconReport,
+  IconImage,
+  IconDocuments,
+  IconAudio,
+  IconVideo,
+} from './Icons'
 
-const looseFiles = [
-  { name: 'photo.jpg', category: 'Images', icon: IconImage },
-  { name: 'report.pdf', category: 'Documents', icon: IconDocuments },
-  { name: 'track.mp3', category: 'Audio', icon: IconAudio },
-  { name: 'movie.mp4', category: 'Video', icon: IconVideo },
-  { name: 'backup.zip', category: 'Archives', icon: IconFile },
+const workflowNodes = [
+  {
+    id: 'folder',
+    title: 'Pick folder',
+    subtitle: 'Downloads/',
+    Icon: IconFolder,
+    x: 6,
+    y: 14,
+    accent: '#6366f1',
+    type: 'trigger',
+  },
+  {
+    id: 'scan',
+    title: 'Scan files',
+    subtitle: '5 loose items',
+    Icon: IconFile,
+    x: 34,
+    y: 14,
+    accent: '#8b5cf6',
+    type: 'action',
+  },
+  {
+    id: 'classify',
+    title: 'Classify',
+    subtitle: 'By extension',
+    Icon: IconSort,
+    x: 62,
+    y: 14,
+    accent: '#a855f7',
+    type: 'action',
+  },
+  {
+    id: 'dryrun',
+    title: 'Dry-run',
+    subtitle: 'Preview moves',
+    Icon: IconShield,
+    x: 18,
+    y: 54,
+    accent: '#059669',
+    type: 'action',
+  },
+  {
+    id: 'organize',
+    title: 'Organize',
+    subtitle: 'Move to folders',
+    Icon: IconFolder,
+    x: 46,
+    y: 54,
+    accent: '#2563eb',
+    type: 'action',
+  },
+  {
+    id: 'report',
+    title: 'PDF report',
+    subtitle: 'Save summary',
+    Icon: IconReport,
+    x: 74,
+    y: 54,
+    accent: '#dc2626',
+    type: 'output',
+  },
 ]
 
-const sortedFolders = [
-  { name: 'Images/', count: 2, icon: IconImage },
-  { name: 'Documents/', count: 1, icon: IconDocuments },
-  { name: 'Audio/', count: 1, icon: IconAudio },
-  { name: 'Video/', count: 1, icon: IconVideo },
-  { name: 'Archives/', count: 1, icon: IconFile },
+const workflowEdges = [
+  { from: 'folder', to: 'scan' },
+  { from: 'scan', to: 'classify' },
+  { from: 'classify', to: 'dryrun' },
+  { from: 'dryrun', to: 'organize' },
+  { from: 'organize', to: 'report' },
 ]
 
-const STATUS = {
-  SCANNING: 'scanning',
-  MOVING: 'moving',
-  COMPLETE: 'complete',
+const categoryChips = [
+  { label: 'Images', ext: '.jpg', Icon: IconImage, color: '#ec4899' },
+  { label: 'Documents', ext: '.pdf', Icon: IconDocuments, color: '#f59e0b' },
+  { label: 'Audio', ext: '.mp3', Icon: IconAudio, color: '#14b8a6' },
+  { label: 'Video', ext: '.mp4', Icon: IconVideo, color: '#3b82f6' },
+]
+
+const NODE_W = 18
+const NODE_H = 14
+
+function nodeCenter(node) {
+  return { x: node.x + NODE_W / 2, y: node.y + NODE_H / 2 }
+}
+
+function edgePath(from, to) {
+  const a = nodeCenter(from)
+  const b = nodeCenter(to)
+  const dx = Math.abs(b.x - a.x)
+  const curve = Math.max(dx * 0.45, 8)
+  return `M ${a.x} ${a.y} C ${a.x + curve} ${a.y}, ${b.x - curve} ${b.y}, ${b.x} ${b.y}`
 }
 
 export default function Hero() {
-  const [step, setStep] = useState(0)
-  const [movedFiles, setMovedFiles] = useState([])
-  const [currentStatus, setCurrentStatus] = useState(STATUS.SCANNING)
-  const [progress, setProgress] = useState(0)
-  const [activeFile, setActiveFile] = useState(null)
-
-  const totalFiles = looseFiles.length
-
-  const reset = useCallback(() => {
-    setStep(0)
-    setMovedFiles([])
-    setCurrentStatus(STATUS.SCANNING)
-    setProgress(0)
-    setActiveFile(null)
-  }, [])
+  const [activeStep, setActiveStep] = useState(0)
+  const totalSteps = workflowNodes.length
 
   useEffect(() => {
-    if (step >= totalFiles) {
-      const timer = setTimeout(() => {
-        reset()
-      }, 3000)
-      return () => clearTimeout(timer)
-    }
+    const timer = setInterval(() => {
+      setActiveStep((s) => (s + 1) % totalSteps)
+    }, 1800)
+    return () => clearInterval(timer)
+  }, [totalSteps])
 
-    const scanTimer = setTimeout(() => {
-      setCurrentStatus(STATUS.MOVING)
-      setActiveFile(step)
-
-      const moveTimer = setTimeout(() => {
-        setMovedFiles((prev) => [...prev, looseFiles[step].category])
-        setProgress(((step + 1) / totalFiles) * 100)
-        setActiveFile(null)
-        setStep((s) => s + 1)
-        setCurrentStatus(step + 1 >= totalFiles ? STATUS.COMPLETE : STATUS.SCANNING)
-      }, 800)
-
-      return () => clearTimeout(moveTimer)
-    }, 400)
-
-    return () => clearTimeout(scanTimer)
-  }, [step, totalFiles, reset])
-
-  const getFolderCount = (category) => {
-    return movedFiles.filter((f) => f === category).length
-  }
+  const activeNodeId = workflowNodes[activeStep]?.id
+  const activeEdgeIndex = Math.max(0, activeStep - 1)
 
   return (
     <section className="hero">
@@ -103,82 +152,103 @@ export default function Hero() {
           </div>
         </div>
 
-        <div className="hero-demo card" aria-hidden="true">
-          <div className="demo-header">
-            <span className="demo-dot" />
-            <span className="demo-dot" />
-            <span className="demo-dot" />
-            <span className="demo-title">urFileManager — Downloads</span>
+        <div className="hero-workflow card" aria-hidden="true">
+          <div className="workflow-toolbar">
+            <div className="workflow-toolbar-left">
+              <span className="workflow-dot" />
+              <span className="workflow-dot" />
+              <span className="workflow-dot" />
+              <span className="workflow-title">Organize workflow</span>
+            </div>
+            <span className="workflow-status">
+              Step {activeStep + 1}/{totalSteps} ·{' '}
+              {workflowNodes[activeStep]?.title}
+            </span>
           </div>
 
-          <div className="demo-body">
-            <div className={`demo-panel demo-before ${currentStatus === STATUS.SCANNING ? 'demo-panel-active' : ''}`}>
-              <p className="demo-label">Before — loose files</p>
-              <div className="demo-folder-row">
-                <IconFolder />
-                <span>Downloads/</span>
-              </div>
-              <ul className="demo-file-list">
-                {looseFiles.map((file, i) => {
-                  const Icon = file.icon
-                  const isDone = movedFiles.includes(file.category) || i < step
-                  const isActive = activeFile === i
-                  return (
-                    <li
-                      key={file.name}
-                      className={`${isDone ? 'demo-file-done' : ''} ${isActive ? 'demo-file-active' : ''}`}
-                    >
+          <div className="workflow-canvas">
+            <svg className="workflow-edges" viewBox="0 0 100 72" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="edge-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#6366f1" />
+                  <stop offset="100%" stopColor="#2563eb" />
+                </linearGradient>
+              </defs>
+              {workflowEdges.map((edge, i) => {
+                const from = workflowNodes.find((n) => n.id === edge.from)
+                const to = workflowNodes.find((n) => n.id === edge.to)
+                if (!from || !to) return null
+                const isActive = i <= activeEdgeIndex
+                const isCurrent = i === activeEdgeIndex
+                return (
+                  <path
+                    key={`${edge.from}-${edge.to}`}
+                    d={edgePath(from, to)}
+                    className={`workflow-edge ${isActive ? 'workflow-edge-done' : ''} ${isCurrent ? 'workflow-edge-active' : ''}`}
+                    fill="none"
+                    strokeWidth="0.55"
+                    vectorEffect="non-scaling-stroke"
+                  />
+                )
+              })}
+            </svg>
+
+            {workflowNodes.map((node, index) => {
+              const Icon = node.Icon
+              const isActive = node.id === activeNodeId
+              const isDone = index < activeStep
+              return (
+                <div
+                  key={node.id}
+                  className={`workflow-node workflow-node-${node.type} ${isActive ? 'workflow-node-active' : ''} ${isDone ? 'workflow-node-done' : ''}`}
+                  style={{ left: `${node.x}%`, top: `${node.y}%` }}
+                >
+                  <span className="workflow-port workflow-port-in" />
+                  <div className="workflow-node-body">
+                    <div className="workflow-node-icon" style={{ '--node-accent': node.accent }}>
                       <Icon />
-                      <span className="demo-file-name">{file.name}</span>
-                      {isDone && <span className="demo-file-check">✓</span>}
-                    </li>
-                  )
-                })}
-              </ul>
-            </div>
+                    </div>
+                    <div className="workflow-node-text">
+                      <span className="workflow-node-title">{node.title}</span>
+                      <span className="workflow-node-sub">{node.subtitle}</span>
+                    </div>
+                  </div>
+                  <span className="workflow-port workflow-port-out" />
+                  {isActive && <span className="workflow-pulse" />}
+                </div>
+              )
+            })}
 
-            <div className="demo-flow">
-              <div className="demo-flow-line" />
-              <span className={`demo-flow-badge ${currentStatus}`}>
-                {currentStatus === STATUS.SCANNING && 'Scanning...'}
-                {currentStatus === STATUS.MOVING && `Move to ${looseFiles[activeFile]?.category}`}
-                {currentStatus === STATUS.COMPLETE && 'Complete!'}
-              </span>
-              <svg viewBox="0 0 24 24" fill="none" className={`demo-arrow ${currentStatus === STATUS.COMPLETE ? 'demo-arrow-done' : ''}`}>
-                <path d="M12 5v14M12 19l-5-5M12 19l5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-              </svg>
-            </div>
-
-            <div className={`demo-panel demo-after ${currentStatus === STATUS.MOVING || currentStatus === STATUS.COMPLETE ? 'demo-panel-active' : ''}`}>
-              <p className="demo-label">After — sorted folders</p>
-              <ul className="demo-folder-list">
-                {sortedFolders.map((folder) => {
-                  const count = getFolderCount(folder.name.replace('/', ''))
+            <div className="workflow-branch">
+              <span className="workflow-branch-label">Routes to</span>
+              <div className="workflow-chips">
+                {categoryChips.map((chip) => {
+                  const ChipIcon = chip.Icon
+                  const lit = activeStep >= 2
                   return (
-                    <li key={folder.name} className={count > 0 ? 'demo-folder-has' : ''}>
-                      <folder.icon />
-                      <span>{folder.name}</span>
-                      <span className={`demo-count ${count > 0 ? 'demo-count-filled' : ''}`}>
-                        {count > 0 ? count : 0}
-                      </span>
-                    </li>
+                    <span
+                      key={chip.label}
+                      className={`workflow-chip ${lit || activeStep >= 3 ? 'workflow-chip-lit' : ''}`}
+                      style={{ '--chip-color': chip.color }}
+                    >
+                      <ChipIcon />
+                      {chip.ext}
+                    </span>
                   )
                 })}
-              </ul>
+              </div>
             </div>
           </div>
 
-          <div className="demo-footer">
-            <div className="demo-progress">
+          <div className="workflow-footer">
+            <div className="workflow-progress">
               <div
-                className="demo-progress-fill"
-                style={{ width: `${progress}%` }}
+                className="workflow-progress-fill"
+                style={{ width: `${((activeStep + 1) / totalSteps) * 100}%` }}
               />
             </div>
-            <span>
-              {currentStatus === STATUS.COMPLETE
-                ? `Organized ${totalFiles} files into ${totalFiles} categories`
-                : `Organizing ${movedFiles.length} of ${totalFiles} files`}
+            <span className="workflow-footer-text">
+              {workflowNodes[activeStep]?.subtitle} — automated pipeline, fully offline
             </span>
           </div>
         </div>
