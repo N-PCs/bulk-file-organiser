@@ -1,0 +1,242 @@
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Desktop layers ───────────────────────────────────── */
+
+.hero-bg-desktop {
+  position: absolute;
+  inset: 0;
+}
+
+.hero-bg-mobile {
+  display: none;
+}
+
+/* ── Ambient orbs ─────────────────────────────────────── */
+
+.hero-orb {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.35;
+  animation: orbDrift ease-in-out infinite alternate;
+  transform: translate(-50%, -50%);
+}
+
+@keyframes orbDrift {
+  0% { transform: translate(-50%, -50%) scale(1); opacity: 0.25; }
+  100% { transform: translate(-50%, -50%) scale(1.15); opacity: 0.45; }
+}
+
+/* ── Network constellation ────────────────────────────── */
+
+.hero-network {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.hero-net-edge {
+  stroke: var(--border-strong);
+  stroke-width: 0.15;
+  opacity: 0.4;
+}
+
+.hero-net-node {
+  r: 0.6;
+  fill: var(--border-strong);
+  opacity: 0.5;
+  animation: nodeBlink 3s ease-in-out infinite alternate;
+}
+
+@keyframes nodeBlink {
+  0% { opacity: 0.2; r: 0.4; }
+  50% { opacity: 0.8; r: 0.8; fill: var(--primary); }
+  100% { opacity: 0.2; r: 0.4; }
+}
+
+/* ── Floating wireframe shapes ────────────────────────── */
+
+.hero-shape {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  animation: shapeFloat ease-in-out infinite alternate;
+}
+
+.hero-shape::before,
+.hero-shape::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+.hero-shape-hex {
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  border: 1px solid var(--border-strong);
+  background: transparent;
+}
+
+.hero-shape-hex::before {
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  border: 1px solid color-mix(in srgb, var(--primary) 25%, transparent);
+  background: color-mix(in srgb, var(--primary) 3%, transparent);
+}
+
+.hero-shape-diamond {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.hero-shape-diamond::before {
+  border: 1px solid color-mix(in srgb, var(--primary) 20%, var(--border-strong));
+  background: color-mix(in srgb, var(--primary) 2%, transparent);
+}
+
+.hero-shape-circle {
+  border-radius: 50%;
+}
+
+.hero-shape-circle::before {
+  border: 1px solid color-mix(in srgb, var(--primary) 15%, var(--border-strong));
+  background: transparent;
+  border-radius: 50%;
+}
+
+@keyframes shapeFloat {
+  0% {
+    transform: translate(-50%, -50%) rotate(var(--shape-rotate, 0deg)) translateY(0);
+    opacity: 0.25;
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(calc(var(--shape-rotate, 0deg) + 8deg)) translateY(-16px);
+    opacity: 0.5;
+  }
+}
+
+/* ── Film grain overlay ───────────────────────────────── */
+
+.hero-grain {
+  position: absolute;
+  inset: 0;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 128px 128px;
+}
+
+/* ══════════════════════════════════════════════════════
+   MOBILE — bold gradient mesh + floating dots + lines
+   ══════════════════════════════════════════════════════ */
+
+.hero-bg-mobile {
+  position: absolute;
+  inset: 0;
+}
+
+/* Gradient mesh — two big soft blobs that shift */
+.hero-mobile-mesh {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 75% 25%, color-mix(in srgb, var(--primary) 18%, transparent), transparent),
+    radial-gradient(ellipse 50% 60% at 20% 75%, color-mix(in srgb, var(--accent-soft) 22%, transparent), transparent);
+  animation: meshShift 8s ease-in-out infinite alternate;
+}
+
+@keyframes meshShift {
+  0% { opacity: 0.7; transform: scale(1) translateY(0); }
+  100% { opacity: 1; transform: scale(1.05) translateY(-8px); }
+}
+
+/* Faint grid pattern */
+.hero-mobile-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--border) 40%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--border) 40%, transparent) 1px, transparent 1px);
+  background-size: 40px 40px;
+  opacity: 0.35;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, black 20%, transparent 70%);
+  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, black 20%, transparent 70%);
+}
+
+/* Floating dots */
+.hero-mobile-dot {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--primary);
+  opacity: 0;
+  animation: dotFloat 6s ease-in-out infinite;
+}
+
+@keyframes dotFloat {
+  0% { opacity: 0; transform: translateY(0) scale(0.6); }
+  15% { opacity: 0.5; }
+  50% { opacity: 0.25; transform: translateY(-20px) scale(1); }
+  85% { opacity: 0.5; }
+  100% { opacity: 0; transform: translateY(0) scale(0.6); }
+}
+
+/* Diagonal accent lines */
+.hero-mobile-line {
+  position: absolute;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--primary) 25%, transparent), transparent);
+  opacity: 0;
+  animation: lineSweep 5s ease-in-out infinite;
+}
+
+.hero-mobile-line-1 {
+  width: 70%;
+  top: 35%;
+  left: -10%;
+  transform: rotate(-12deg);
+  animation-delay: 0s;
+}
+
+.hero-mobile-line-2 {
+  width: 60%;
+  top: 65%;
+  right: -10%;
+  transform: rotate(8deg);
+  animation-delay: 2.5s;
+}
+
+@keyframes lineSweep {
+  0% { opacity: 0; transform: rotate(var(--line-rot, -12deg)) translateX(-20px); }
+  30% { opacity: 0.5; }
+  70% { opacity: 0.5; }
+  100% { opacity: 0; transform: rotate(var(--line-rot, -12deg)) translateX(20px); }
+}
+
+/* ── Mobile ───────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .hero-bg-desktop {
+    display: none;
+  }
+
+  .hero-bg-mobile {
+    display: block;
+  }
+
+  .hero-grain {
+    opacity: 0.02;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero-mobile-grid {
+    background-size: 32px 32px;
+    opacity: 0.25;
+  }
+
+  .hero-mobile-dot {
+    width: 2px !important;
+    height: 2px !important;
+  }
+}

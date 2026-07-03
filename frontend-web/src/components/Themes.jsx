@@ -1,4 +1,13 @@
+import { useState, useEffect, useRef, useCallback } from 'react'
 import './Themes.css'
+
+const STORAGE_KEY = 'urfm-theme'
+
+const safeStorage = {
+  get: (key) => { try { return localStorage.getItem(key) } catch { return null } },
+  set: (key, value) => { try { localStorage.setItem(key, value) } catch { /* empty */ } },
+  remove: (key) => { try { localStorage.removeItem(key) } catch { /* empty */ } },
+}
 
 const themes = [
 
@@ -105,32 +114,116 @@ const themes = [
 ]
 
 export default function Themes() {
-  const handleEnter = (vars) => {
+  const [active, setActive] = useState(() => safeStorage.get(STORAGE_KEY))
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 768)
+  const sectionRef = useRef(null)
+
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth <= 768)
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
+
+  const clearTheme = useCallback(() => {
+    const root = document.documentElement
+    const allKeys = Object.keys(themes[0].vars)
+    allKeys.forEach((key) => {
+      root.style.removeProperty(key)
+    })
+  }, [])
+
+  // Revert theme on mobile when scrolling away from section
+  useEffect(() => {
+    const section = sectionRef.current
+    if (!section) return
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (isMobile && !entry.isIntersecting && active) {
+          setActive(null)
+          clearTheme()
+          safeStorage.remove(STORAGE_KEY)
+        }
+      },
+      { threshold: 0 }
+    )
+
+    observer.observe(section)
+    return () => observer.disconnect()
+  }, [active, clearTheme, isMobile])
+
+  useEffect(() => {
+    if (active) {
+      const theme = themes.find((t) => t.name === active)
+      if (theme) {
+        const root = document.documentElement
+        Object.entries(theme.vars).forEach(([key, value]) => {
+          root.style.setProperty(key, value)
+        })
+      }
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const applyTheme = (vars) => {
     const root = document.documentElement
     Object.entries(vars).forEach(([key, value]) => {
       root.style.setProperty(key, value)
     })
   }
 
+  const handleClick = (theme) => {
+    if (active === theme.name) {
+      setActive(null)
+      clearTheme()
+      safeStorage.remove(STORAGE_KEY)
+    } else {
+      setActive(theme.name)
+      applyTheme(theme.vars)
+      safeStorage.set(STORAGE_KEY, theme.name)
+    }
+  }
+
+  const handleEnter = (vars) => {
+    applyTheme(vars)
+  }
+
   const handleLeave = () => {
-    const root = document.documentElement
-    const defaultVars = themes.find((t) => t.default)?.vars || themes[1].vars
-    Object.keys(defaultVars).forEach((key) => {
-      root.style.removeProperty(key)
-    })
+    if (active) {
+      const theme = themes.find((t) => t.name === active)
+      if (theme) {
+        applyTheme(theme.vars)
+        return
+      }
+    }
+    clearTheme()
+  }
+
+  const handleCardClick = (theme) => {
+    if (!isMobile) return
+    handleClick(theme)
+  }
+
+  const handleCardEnter = (vars) => {
+    if (isMobile) return
+    handleEnter(vars)
+  }
+
+  const handleCardLeave = () => {
+    if (isMobile) return
+    handleLeave()
   }
 
   return (
-    <section id="themes" className="section themes">
+    <section id="themes" className="section themes" ref={sectionRef}>
       <div className="container">
         <div className="themes-layout">
           <div className="themes-text">
-            <span className="section-label">Themes</span>
+            <span className="section-label" style={{color:"var(--primary)",fontSize:"1.0rem"}}>Themes</span>
             <h2 className="section-title">Five interfaces, one engine</h2>
             <p className="section-subtitle">
-              Hover over any theme to preview it on the website. Switch between color
-              schemes designed for different workspaces — from professional dark mode
-              to clean light layouts.
+              {isMobile
+                ? 'Tap any theme to apply it. Scroll away to revert.'
+                : 'Hover over any theme to preview it live. Switch between color schemes designed for different workspaces — from professional dark mode to clean light layouts.'}
             </p>
           </div>
 
@@ -138,9 +231,10 @@ export default function Themes() {
             {themes.map((theme) => (
               <div
                 key={theme.name}
-                className="theme-card card"
-                onMouseEnter={() => handleEnter(theme.vars)}
-                onMouseLeave={handleLeave}
+                className={`theme-card card${active === theme.name ? ' active' : ''}`}
+                onClick={() => handleCardClick(theme)}
+                onMouseEnter={() => handleCardEnter(theme.vars)}
+                onMouseLeave={handleCardLeave}
               >
                 <div className="theme-preview">
                   {theme.colors.map((color) => (
@@ -149,6 +243,7 @@ export default function Themes() {
                 </div>
                 <div className="theme-meta">
                   <span className="theme-name">{theme.name}</span>
+                  {active === theme.name && <span className="theme-active-badge">Active</span>}
                 </div>
               </div>
             ))}

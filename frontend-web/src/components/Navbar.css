@@ -27,10 +27,6 @@
   gap: 0;
 }
 
-.navbar-inner .container {
-  display: contents;
-}
-
 .navbar-brand {
   font-size: 1.125rem;
   font-weight: 800;
@@ -47,7 +43,7 @@
 .navbar-links {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
   margin-left: auto;
   background: color-mix(in srgb, var(--bg-muted) 60%, transparent);
   padding: 6px 8px;
@@ -56,7 +52,28 @@
   flex-shrink: 0;
 }
 
-.navbar-links a {
+.navbar-home {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: 999px;
+  color: var(--text-secondary);
+  transition: color var(--transition), background var(--transition);
+}
+
+.navbar-home svg {
+  width: 16px;
+  height: 16px;
+}
+
+.navbar-home:hover {
+  color: var(--text);
+  background: color-mix(in srgb, var(--accent-soft) 40%, transparent);
+}
+
+.navbar-links a:not(.navbar-home) {
   font-size: 0.8125rem;
   font-weight: 500;
   color: var(--text-secondary);
@@ -67,11 +84,11 @@
   white-space: nowrap;
 }
 
-.navbar-links a::after {
+.navbar-links a:not(.navbar-home)::after {
   display: none;
 }
 
-.navbar-links a:hover {
+.navbar-links a:not(.navbar-home):hover {
   color: var(--text);
   background: color-mix(in srgb, var(--accent-soft) 40%, transparent);
 }
@@ -85,6 +102,137 @@
   flex-shrink: 0;
 }
 
+.navbar-burger {
+  display: none;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border-radius: 999px;
+  color: var(--text-secondary);
+  margin-right: 8px;
+  transition: color var(--transition), background var(--transition);
+}
+
+.navbar-burger svg {
+  width: 20px;
+  height: 20px;
+}
+
+.navbar-burger:hover {
+  color: var(--text);
+  background: color-mix(in srgb, var(--accent-soft) 40%, transparent);
+}
+
+/* ── Sidebar ─────────────────────────────────────────── */
+
+.sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 200;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.sidebar-backdrop.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(320px, 85vw);
+  background: var(--bg-white);
+  border-left: 1px solid var(--border);
+  z-index: 201;
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar.open {
+  transform: translateX(0);
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar-brand {
+  font-size: 1.125rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--text), var(--secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.sidebar-close {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  color: var(--text-secondary);
+  transition: color var(--transition), background var(--transition);
+}
+
+.sidebar-close svg {
+  width: 18px;
+  height: 18px;
+}
+
+.sidebar-close:hover {
+  color: var(--text);
+  background: color-mix(in srgb, var(--accent-soft) 40%, transparent);
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  padding: 16px 12px;
+  gap: 4px;
+}
+
+.sidebar-nav a {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  transition: color var(--transition), background var(--transition);
+}
+
+.sidebar-nav a:hover {
+  color: var(--text);
+  background: color-mix(in srgb, var(--accent-soft) 30%, transparent);
+}
+
+.sidebar-cta {
+  margin-top: 8px;
+  background: var(--primary) !important;
+  color: var(--bg) !important;
+  font-weight: 600 !important;
+  text-align: center;
+}
+
+.sidebar-cta:hover {
+  background: var(--primary-hover) !important;
+}
+
+/* ── Mobile ───────────────────────────────────────────── */
+
 @media (max-width: 768px) {
   .navbar {
     top: 12px;
@@ -93,6 +241,10 @@
 
   .navbar-links {
     display: none;
+  }
+
+  .navbar-burger {
+    display: grid;
   }
 
   .navbar-inner {

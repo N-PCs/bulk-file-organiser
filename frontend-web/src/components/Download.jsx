@@ -77,7 +77,7 @@ export default function Download() {
     <section id="download" className="section download">
       <div className="container">
         <div className="download-header">
-          <span className="section-label">Download</span>
+          <span className="section-label" style={{color:"var(--primary)",fontSize:"1.0rem"}}>Download</span>
           <h2 className="section-title">Available for all platforms</h2>
           <p className="section-subtitle">
             Native C++ performance on Windows, Linux, and macOS. No runtime required.
@@ -131,7 +131,7 @@ export default function Download() {
                   <a
                     href={href}
                     download={platform.zipName}
-                    className="btn btn-primary btn-lg download-btn"
+                    className="btn btn-primary btn-lg download-btn" style={{color:"black"}}
                     onClick={() => setSelectedPlatform(platform.id)}
                   >
                     <IconDownload className="btn-icon" />

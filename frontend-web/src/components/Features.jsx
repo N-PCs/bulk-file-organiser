@@ -48,9 +48,9 @@ const features = [
   },
   {
     Icon: IconPalette,
-    title: 'Six UI Themes',
+    title: 'Five UI Themes',
     description:
-      'Pitch Black, Minimalist Light, Midnight Dark, Nordic Frost, Forest Emerald, Neon Cyberpunk, and Amber Terminal. Switch themes from within the app.',
+      'Minimalist Light, Midnight Dark, Nordic Frost, Forest Emerald, Neon Cyberpunk. Switch themes from within the app.',
     tag: 'UI',
   },
   {
@@ -74,7 +74,7 @@ export default function Features() {
     <section id="features" className="section features">
       <div className="container">
         <div className="features-header">
-          <span className="section-label">Features</span>
+          <span className="section-label" style={{color:"var(--primary)",fontSize:"1.0rem"}}>Features</span>
           <h2 className="section-title">Built for reliable file organization</h2>
           <p className="section-subtitle">
             A native cross-platform utility with no cloud dependency, no subscriptions, and no

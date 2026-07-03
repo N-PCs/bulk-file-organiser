@@ -258,7 +258,7 @@ export default function HowItWorks() {
     <section id="how-it-works" className="section how-it-works">
       <div className="container">
         <div className="how-header">
-          <span className="section-label">How it works</span>
+          <span className="section-label" style={{color:"var(--primary)",fontSize:"1.0rem"}}>How it works</span>
           <h2 className="section-title">Three steps to a clean folder</h2>
         </div>
 

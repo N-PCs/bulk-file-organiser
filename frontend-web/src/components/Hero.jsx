@@ -1,15 +1,15 @@
 import './Hero.css'
-import { IconWindows } from './Icons'
+import HeroBg from './HeroBg'
 
 export default function Hero() {
   return (
-    <section className="hero">
+    <section id="home" className="hero">
+      <HeroBg />
       <div className="container hero-layout">
         <div className="hero-copy">
-          <p className="hero-eyebrow">Cross-platform file organizer</p>
+          <p className="hero-eyebrow " style={{ color: "var(--primary)", fontSize:"1.0rem"}}>Cross-platform file organizer</p>
           <h1 className="hero-title">
             Turn a messy folder into an organized one!
-            <span className="hero-gradient">organized categories</span>
           </h1>
           <p className="hero-description">
             Point urFileManager at any cluttered directory — like Downloads — and it moves

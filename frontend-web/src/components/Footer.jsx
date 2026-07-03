@@ -3,9 +3,9 @@ import './Footer.css'
 export default function Footer() {
   return (
     <footer className="footer">
-      <div className="container footer-inner">
-        <div className="footer-brand">
-          <span className="footer-logo">urFM</span>
+      <div className="container footer-inner" >
+        <div className="footer-brand" >
+          <span className="footer-logo" style={{color:"var(--primary)"}}>urFM</span>
           <p className="footer-tagline">Smart file organization for all platforms.</p>
         </div>
 
@@ -16,7 +16,7 @@ export default function Footer() {
           <a href="#download">Download</a>
         </div>
 
-        <p className="footer-copy">
+        <p className="footer-copy" >
           © {new Date().getFullYear()} urFileManager. Native C++, fully offline, no tracking.
           <span className="footer-credit">
             {' '}
