@@ -79,70 +79,65 @@
 }
 
 @media (max-width: 640px) {
-  .hero-bars {
-    display: none;
-  }
+  .hero-bars { display: none; }
 
   .hero-mobile-bg {
+    display: block;
     position: absolute;
     inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    overflow: hidden;
   }
 
-  .pulse-ring {
+  .mobile-glow {
     position: absolute;
-    border-radius: 50%;
-    border: 1px solid var(--primary);
-    opacity: 0;
-    animation: ringPulse 4s ease-in-out infinite;
-  }
-
-  .ring-1 {
+    bottom: 5%;
+    left: 50%;
+    transform: translateX(-50%);
     width: 200px;
     height: 200px;
-    animation-delay: 0s;
-  }
-
-  .ring-2 {
-    width: 350px;
-    height: 350px;
-    animation-delay: 0.8s;
-  }
-
-  .ring-3 {
-    width: 500px;
-    height: 500px;
-    animation-delay: 1.6s;
-  }
-
-  @keyframes ringPulse {
-    0%   { transform: scale(0.6); opacity: 0; }
-    20%  { opacity: 0.25; }
-    50%  { transform: scale(1); opacity: 0.15; }
-    100% { transform: scale(1.4); opacity: 0; }
-  }
-
-  .pulse-dot {
-    position: absolute;
-    width: 4px;
-    height: 4px;
-    background: var(--primary);
     border-radius: 50%;
-    opacity: 0;
-    animation: dotPulse 3s ease-in-out infinite;
+    background: var(--primary);
+    opacity: 0.08;
+    filter: blur(50px);
+    animation: glowBreathe 4s ease-in-out infinite alternate;
   }
 
-  .dot-1 { top: 20%; left: 15%; animation-delay: 0.0s; }
-  .dot-2 { top: 35%; right: 20%; animation-delay: 0.5s; }
-  .dot-3 { bottom: 30%; left: 25%; animation-delay: 1.0s; }
-  .dot-4 { bottom: 20%; right: 15%; animation-delay: 1.5s; }
-  .dot-5 { top: 50%; left: 10%; animation-delay: 2.0s; }
-  .dot-6 { top: 45%; right: 10%; animation-delay: 2.5s; }
-
-  @keyframes dotPulse {
-    0%, 100% { opacity: 0; transform: scale(0.5); }
-    50%      { opacity: 0.35; transform: scale(1); }
+  @keyframes glowBreathe {
+    0%   { opacity: 0.05; transform: translateX(-50%) scale(0.8); }
+    100% { opacity: 0.12; transform: translateX(-50%) scale(1.1); }
   }
+
+  .mobile-bar {
+    position: absolute;
+    bottom: 0;
+    width: 4px;
+    background: var(--primary);
+    opacity: 0.2;
+    border-radius: 3px 3px 0 0;
+    transform-origin: bottom;
+    animation: barWave 2.4s ease-in-out infinite;
+  }
+
+  .mobile-bar::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 20px;
+    background: var(--primary);
+    filter: blur(14px);
+    opacity: 0.4;
+  }
+
+  .mb-1  { left: 6%;  height: 45%; animation-delay: 0.0s; }
+  .mb-2  { left: 16%; height: 65%; animation-delay: 0.25s; }
+  .mb-3  { left: 26%; height: 35%; animation-delay: 0.5s; }
+  .mb-4  { left: 36%; height: 75%; animation-delay: 0.75s; }
+  .mb-5  { left: 46%; height: 50%; animation-delay: 1.0s; }
+  .mb-6  { left: 56%; height: 70%; animation-delay: 1.25s; }
+  .mb-7  { left: 66%; height: 40%; animation-delay: 1.5s; }
+  .mb-8  { left: 76%; height: 60%; animation-delay: 1.75s; }
+  .mb-9  { left: 86%; height: 30%; animation-delay: 2.0s; }
 }

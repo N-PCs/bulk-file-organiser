@@ -17,15 +17,12 @@ export default function HeroBg() {
         <div className="bar bar-11" />
       </div>
       <div className="hero-mobile-bg">
-        <div className="pulse-ring ring-1" />
-        <div className="pulse-ring ring-2" />
-        <div className="pulse-ring ring-3" />
-        <div className="pulse-dot dot-1" />
-        <div className="pulse-dot dot-2" />
-        <div className="pulse-dot dot-3" />
-        <div className="pulse-dot dot-4" />
-        <div className="pulse-dot dot-5" />
-        <div className="pulse-dot dot-6" />
+        <div className="wave-left wave-1" />
+        <div className="wave-left wave-2" />
+        <div className="wave-left wave-3" />
+        <div className="wave-right wave-1" />
+        <div className="wave-right wave-2" />
+        <div className="wave-right wave-3" />
       </div>
       <div className="hero-grain" />
     </div>
