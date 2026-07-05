@@ -27,6 +27,10 @@
 #pragma comment(lib, "uuid.lib")
 #pragma comment(lib, "shell32.lib")
 
+#ifndef WS_EX_NOREDIRECTIONBITMAP
+#define WS_EX_NOREDIRECTIONBITMAP 0x00200000L
+#endif
+
 #define WM_APP_LOG      (WM_USER + 1)
 #define WM_APP_PROGRESS (WM_USER + 2)
 #define WM_APP_STATUS   (WM_USER + 3)
@@ -475,6 +479,30 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
                         g_movedFiles = moved; g_srcDir = src; g_lastDryRun = dry; g_undoHistory = undo;
                         if (!dry && !undo.empty()) {
                             AppendLog(L"Undo history saved. " + std::to_wstring(undo.size()) + L" file(s) can be reverted.");
+                        }
+                        // Generate PDF report
+                        if (!moved.empty()) {
+                            std::wstring reportName = dry ? L"organization_report_preview.pdf" : L"organization_report.pdf";
+                            std::wstring outPath = (std::filesystem::path(src) / reportName).wstring();
+                            try {
+                                std::string savePath(outPath.begin(), outPath.end());
+                                std::string targetFolder(src.begin(), src.end());
+                                std::vector<MovedFileInfoStr> converted;
+                                converted.reserve(moved.size());
+                                for (const auto& m : moved) {
+                                    MovedFileInfoStr rec;
+                                    rec.fileName = std::string(m.fileName.begin(), m.fileName.end());
+                                    rec.category = std::string(m.category.begin(), m.category.end());
+                                    rec.fileSize = m.fileSize;
+                                    rec.status = std::string(m.status.begin(), m.status.end());
+                                    converted.push_back(rec);
+                                }
+                                GeneratePDFReportStr(savePath, targetFolder, converted, dry);
+                                AppendLog(L"PDF report generated: " + reportName);
+                            } catch (const std::exception& e) {
+                                std::string es = e.what();
+                                AppendLog(L"Failed to generate PDF: " + std::wstring(es.begin(), es.end()));
+                            }
                         }
                         AppendLog(L"Done. Processed " + std::to_wstring(ok) + L"/" + std::to_wstring(total) + L" files.");
                         PostMessage(h, WM_APP_DONE, 0, 0); delete p;

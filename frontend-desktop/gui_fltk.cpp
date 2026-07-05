@@ -46,27 +46,11 @@ std::vector<MovedFileInfo> g_movedFiles;
 std::string g_srcDir;
 bool g_lastDryRun = false;
 
-// Theme colors for FLTK
-struct FlTheme {
-    Fl_Color windowBg, cardBg, textColor, accentColor;
-};
-std::vector<FlTheme> g_flThemes;
-
-void initFLThemes() {
-    g_flThemes = {
-        { fl_rgb_color(15,15,17), fl_rgb_color(24,24,27), fl_rgb_color(228,228,231), fl_rgb_color(99,102,241) },
-        { fl_rgb_color(244,244,245), fl_rgb_color(255,255,255), fl_rgb_color(39,39,42), fl_rgb_color(79,70,229) },
-        { fl_rgb_color(46,52,64), fl_rgb_color(59,66,82), fl_rgb_color(229,233,240), fl_rgb_color(136,192,208) },
-        { fl_rgb_color(20,28,24), fl_rgb_color(28,40,34), fl_rgb_color(218,231,224), fl_rgb_color(16,185,129) },
-        { fl_rgb_color(10,10,15), fl_rgb_color(20,15,30), fl_rgb_color(255,255,255), fl_rgb_color(255,0,127) },
-    };
-}
-
 void applyTheme(int idx) {
-    if (idx < 0 || idx >= (int)g_flThemes.size()) idx = 0;
-    const auto& t = g_flThemes[idx];
-    Fl::background((t.windowBg>>24)&0xFF, (t.windowBg>>16)&0xFF, (t.windowBg>>8)&0xFF);
-    Fl::foreground((t.textColor>>24)&0xFF, (t.textColor>>16)&0xFF, (t.textColor>>8)&0xFF);
+    if (idx < 0 || idx >= (int)g_themes.size()) idx = 0;
+    const auto& t = g_themes[idx];
+    Fl::background((t.windowBg>>16)&0xFF, (t.windowBg>>8)&0xFF, t.windowBg&0xFF);
+    Fl::foreground((t.textTitle>>16)&0xFF, (t.textTitle>>8)&0xFF, t.textTitle&0xFF);
     if (g_win) g_win->redraw();
 }
 
@@ -324,7 +308,6 @@ int main(int argc, char** argv) {
     }
 
     // GUI mode
-    initFLThemes();
     Fl::scheme("gtk+");
 
     // Load config
