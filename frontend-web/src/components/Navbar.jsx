@@ -18,7 +18,9 @@ export default function Navbar() {
     <>
       <header className="navbar">
         <div className="navbar-inner">
+          <img src='./logo.png' className="navbar-logo" alt="urFileManager logo"></img>
           <a href="#" className="navbar-brand">
+
             urFileManager
           </a>
 

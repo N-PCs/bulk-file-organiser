@@ -20,8 +20,8 @@ export default function Hero() {
             <a href="#download" className="btn btn-primary btn-lg " style={{ color: "black" }}>
               Download urFM
             </a>
-            <a href="#download" className="btn btn-secondary btn-lg">
-              CLI install commands
+            <a href="#workflow-diagram" className="btn btn-secondary btn-lg">
+              How It Works ?
             </a>
           </div>
         </div>

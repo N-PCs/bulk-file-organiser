@@ -274,6 +274,8 @@ export default function HowItWorks() {
           ))}
         </div>
 
+        {/* Workflow diagram wrapper */}
+        <div id="workflow-diagram" className="workflow-diagram-wrapper">
         {/* Workflow diagram — desktop */}
         <div className="hiw-workflow hiw-workflow-desktop card" aria-hidden="true">
           <div className="workflow-toolbar">
@@ -464,6 +466,7 @@ export default function HowItWorks() {
               {activeStep === 5 && 'PDF report exported — pipeline complete'}
             </span>
           </div>
+        </div>
         </div>
       </div>
     </section>

@@ -1,5 +1,8 @@
 #include <windows.h>
 
+// Application Icon
+1 ICON "organizer.ico"
+
 // Link Manifest
 1 24 "organizer.manifest"
 

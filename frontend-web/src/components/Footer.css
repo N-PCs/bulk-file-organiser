@@ -19,6 +19,16 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.footer-logo-img {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  flex-shrink: 0;
 }
 
 .footer-tagline {
@@ -65,6 +75,10 @@
   color: var(--text-muted);
   padding-top: 24px;
   border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
 }
 
 .footer-credit a {
@@ -75,6 +89,190 @@
 .footer-credit a:hover {
   text-decoration: underline;
 }
+
+/* ── Inline delivery animation ────────────────────────────── */
+
+.fd-inline {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 10px;
+  margin-left: auto;
+  vertical-align: middle;
+}
+
+.fd-inline-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.tiny-folder-svg {
+  width: 18px;
+  height: 18px;
+}
+
+.fd-inline-customer .tiny-folder-svg {
+  color: #ef4444;
+}
+
+.fd-inline-receiver .tiny-folder-svg {
+  color: #10b981;
+}
+
+.fd-inline-label {
+  font-size: 0.5rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  line-height: 1;
+}
+
+.fd-inline-sub {
+  font-size: 0.4rem;
+  color: var(--text-muted);
+  line-height: 1;
+}
+
+/* ── Road segment ─────────────────────────────────────────── */
+
+.fd-inline-road {
+  position: relative;
+  width: 100px;
+  height: 32px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.fd-inline-surface {
+  width: 100%;
+  height: 4px;
+  background: var(--border-strong);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.fd-inline-dash {
+  position: absolute;
+  bottom: 1px;
+  left: 4px;
+  right: 4px;
+  height: 1px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--text-muted) 0,
+    var(--text-muted) 4px,
+    transparent 4px,
+    transparent 9px
+  );
+  opacity: 0.35;
+}
+
+/* ── Walker on road ───────────────────────────────────────── */
+
+.fd-inline-walker {
+  position: absolute;
+  bottom: 4px;
+  left: 0%;
+  z-index: 2;
+  animation: fd-walk 8s ease-in-out infinite;
+}
+
+.tiny-walker-svg {
+  width: 16px;
+  height: 26px;
+  color: var(--primary);
+  filter: drop-shadow(0 1px 3px color-mix(in srgb, var(--primary) 35%, transparent));
+}
+
+/* ── Limb swing ───────────────────────────────────────────── */
+
+.leg-l {
+  transform-origin: 10px 20px;
+  animation: fd-leg-l 0.45s ease-in-out infinite alternate;
+}
+
+.leg-r {
+  transform-origin: 10px 20px;
+  animation: fd-leg-r 0.45s ease-in-out infinite alternate;
+}
+
+.arm-l {
+  transform-origin: 10px 12px;
+  animation: fd-arm-l 0.45s ease-in-out infinite alternate;
+}
+
+.arm-r {
+  transform-origin: 10px 12px;
+  animation: fd-arm-r 0.45s ease-in-out infinite alternate;
+}
+
+@keyframes fd-leg-l {
+  0% { transform: rotate(-18deg); }
+  100% { transform: rotate(18deg); }
+}
+
+@keyframes fd-leg-r {
+  0% { transform: rotate(18deg); }
+  100% { transform: rotate(-18deg); }
+}
+
+@keyframes fd-arm-l {
+  0% { transform: rotate(14deg); }
+  100% { transform: rotate(-14deg); }
+}
+
+@keyframes fd-arm-r {
+  0% { transform: rotate(-14deg); }
+  100% { transform: rotate(14deg); }
+}
+
+/* ── Walker journey ───────────────────────────────────────── */
+
+@keyframes fd-walk {
+  0% {
+    left: 0%;
+    transform: scaleX(1);
+  }
+  45% {
+    left: calc(100% - 16px);
+    transform: scaleX(1);
+  }
+  50% {
+    left: calc(100% - 16px);
+    transform: scaleX(1);
+  }
+  50.1% {
+    left: calc(100% - 16px);
+    transform: scaleX(-1);
+  }
+  95% {
+    left: 0%;
+    transform: scaleX(-1);
+  }
+  100% {
+    left: 0%;
+    transform: scaleX(-1);
+  }
+}
+
+/* ── Carried folder toggle ────────────────────────────────── */
+
+.carried-folder {
+  opacity: 1;
+  animation: fd-carry 8s ease-in-out infinite;
+}
+
+@keyframes fd-carry {
+  0% { opacity: 1; }
+  49% { opacity: 1; }
+  50% { opacity: 0; }
+  100% { opacity: 0; }
+}
+
+/* ── Mobile responsive ────────────────────────────────────── */
 
 @media (max-width: 640px) {
   .footer {
@@ -87,6 +285,24 @@
     gap: 16px;
   }
 
+  .footer-brand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .footer-copy {
+    font-size: 0.75rem;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .fd-inline {
+    margin-left: 0;
+    margin-top: 12px;
+  }
+
   .footer-links {
     justify-content: center;
     flex-wrap: wrap;
@@ -97,8 +313,26 @@
     font-size: 0.8125rem;
   }
 
-  .footer-copy {
-    font-size: 0.75rem;
-    padding-top: 16px;
+  .fd-inline-road {
+    width: 70px;
+    height: 28px;
+  }
+
+  .tiny-folder-svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .tiny-walker-svg {
+    width: 12px;
+    height: 20px;
+  }
+
+  .fd-inline-label {
+    font-size: 0.4375rem;
+  }
+
+  .fd-inline-sub {
+    font-size: 0.35rem;
   }
 }

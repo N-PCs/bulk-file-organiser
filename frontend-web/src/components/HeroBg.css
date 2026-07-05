@@ -88,56 +88,75 @@
     overflow: hidden;
   }
 
-  .mobile-glow {
-    position: absolute;
-    bottom: 5%;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 200px;
-    height: 200px;
-    border-radius: 50%;
-    background: var(--primary);
-    opacity: 0.08;
-    filter: blur(50px);
-    animation: glowBreathe 4s ease-in-out infinite alternate;
-  }
-
-  @keyframes glowBreathe {
-    0%   { opacity: 0.05; transform: translateX(-50%) scale(0.8); }
-    100% { opacity: 0.12; transform: translateX(-50%) scale(1.1); }
-  }
-
-  .mobile-bar {
+  .wave-left,
+  .wave-right {
     position: absolute;
     bottom: 0;
-    width: 4px;
-    background: var(--primary);
-    opacity: 0.2;
-    border-radius: 3px 3px 0 0;
-    transform-origin: bottom;
-    animation: barWave 2.4s ease-in-out infinite;
+    width: 45%;
+    height: 100%;
+    opacity: 0;
+    animation: waveFlicker 3s ease-in-out infinite;
   }
 
-  .mobile-bar::after {
-    content: '';
-    position: absolute;
-    bottom: -10px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 40px;
-    height: 20px;
-    background: var(--primary);
-    filter: blur(14px);
-    opacity: 0.4;
+  .wave-left {
+    left: 0;
+    background: linear-gradient(
+      to right,
+      var(--primary) 0%,
+      color-mix(in srgb, var(--primary) 40%, transparent) 30%,
+      transparent 100%
+    );
+    clip-path: polygon(
+      0% 100%, 0% 30%, 15% 25%, 30% 40%, 45% 20%, 60% 35%,
+      75% 15%, 90% 30%, 100% 50%, 100% 100%
+    );
   }
 
-  .mb-1  { left: 6%;  height: 45%; animation-delay: 0.0s; }
-  .mb-2  { left: 16%; height: 65%; animation-delay: 0.25s; }
-  .mb-3  { left: 26%; height: 35%; animation-delay: 0.5s; }
-  .mb-4  { left: 36%; height: 75%; animation-delay: 0.75s; }
-  .mb-5  { left: 46%; height: 50%; animation-delay: 1.0s; }
-  .mb-6  { left: 56%; height: 70%; animation-delay: 1.25s; }
-  .mb-7  { left: 66%; height: 40%; animation-delay: 1.5s; }
-  .mb-8  { left: 76%; height: 60%; animation-delay: 1.75s; }
-  .mb-9  { left: 86%; height: 30%; animation-delay: 2.0s; }
+  .wave-right {
+    right: 0;
+    background: linear-gradient(
+      to left,
+      var(--primary) 0%,
+      color-mix(in srgb, var(--primary) 40%, transparent) 30%,
+      transparent 100%
+    );
+    clip-path: polygon(
+      0% 50%, 10% 30%, 25% 15%, 40% 35%, 55% 20%, 70% 40%,
+      85% 25%, 100% 30%, 100% 100%, 0% 100%
+    );
+  }
+
+  .wave-left.wave-1,
+  .wave-right.wave-1 {
+    animation-delay: 0s;
+    opacity: 0.06;
+  }
+
+  .wave-left.wave-2,
+  .wave-right.wave-2 {
+    animation-delay: 0.8s;
+    opacity: 0.04;
+    height: 80%;
+  }
+
+  .wave-left.wave-3,
+  .wave-right.wave-3 {
+    animation-delay: 1.6s;
+    opacity: 0.03;
+    height: 60%;
+  }
+
+  @keyframes waveFlicker {
+    0%, 100% { opacity: 0.02; }
+    8%       { opacity: 0.1; }
+    10%      { opacity: 0.03; }
+    25%      { opacity: 0.08; }
+    27%      { opacity: 0.02; }
+    45%      { opacity: 0.12; }
+    47%      { opacity: 0.04; }
+    65%      { opacity: 0.09; }
+    67%      { opacity: 0.02; }
+    85%      { opacity: 0.07; }
+    87%      { opacity: 0.03; }
+  }
 }

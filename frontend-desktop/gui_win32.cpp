@@ -248,7 +248,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int nShow) {
 
     WNDCLASSW wc = {};
     wc.lpfnWndProc = WndProc; wc.hInstance = hInst; wc.lpszClassName = L"UrFmWinGUI";
-    wc.hCursor = LoadCursor(NULL, IDC_ARROW); wc.hIcon = LoadIcon(NULL, IDI_APPLICATION);
+    wc.hCursor = LoadCursor(NULL, IDC_ARROW); wc.hIcon = LoadIcon(hInst, MAKEINTRESOURCE(1));
     RegisterClassW(&wc);
 
     RECT rc = {0,0,SX(740),SY(580)}; AdjustWindowRect(&rc, WS_OVERLAPPED|WS_CAPTION|WS_SYSMENU|WS_MINIMIZEBOX, FALSE);
@@ -396,7 +396,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
             case IDC_VIEW_REPORT_BTN: {
                 if (!g_movedFiles.empty()) {
                     WNDCLASSW wc={}; wc.lpfnWndProc=ReportProc; wc.hInstance=GetModuleHandle(NULL);
-                    wc.lpszClassName=L"UrFmReport"; wc.hCursor=LoadCursor(NULL,IDC_ARROW); wc.hIcon=LoadIcon(NULL,IDI_APPLICATION);
+                    wc.lpszClassName=L"UrFmReport"; wc.hCursor=LoadCursor(NULL,IDC_ARROW);                     wc.hIcon=LoadIcon(GetModuleHandle(NULL),MAKEINTRESOURCE(1));
                     wc.hbrBackground = g_bCard;
                     RegisterClassW(&wc);
                     int d=GetWindowDPI(hWnd); double sc=(double)d/96.0;
