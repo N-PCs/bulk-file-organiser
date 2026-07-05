@@ -6,7 +6,7 @@ export default function Footer() {
       <div className="container footer-inner" >
         <div className="footer-brand" >
           <span className="footer-logo" style={{color:"var(--primary)"}}>urFM</span>
-          <p className="footer-tagline">Smart file organization for all platforms.</p>
+          <p className="footer-tagline">Smart file organization for Windows & Linux.</p>
         </div>
 
         <div className="footer-links">

@@ -9,13 +9,8 @@
                       "platform":  "linux",
                       "name":  "urfm-linux.tar.gz",
                       "size":  8356
-                  },
-                  {
-                      "platform":  "mac",
-                      "name":  "urfm-macos.tar.gz",
-                      "size":  8307
                   }
               ],
-    "generated":  "2026-07-01T23:15:13Z",
+    "generated":  "2026-07-05T00:00:00Z",
     "version":  "1.0.0"
 }

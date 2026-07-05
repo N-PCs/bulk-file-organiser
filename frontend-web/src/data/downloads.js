@@ -48,27 +48,6 @@ export const platforms = [
       './build.sh && ./urfm ~/Downloads --dry-run',
     ],
   },
-  {
-    id: 'mac',
-    name: 'macOS',
-    zipName: 'urfm-macos.tar.gz',
-    archiveType: 'tarball',
-    description: 'Native macOS experience via FLTK. Requires Homebrew for dependencies.',
-    contents: [
-      'urfm — Native macOS binary (FLTK GUI + CLI)',
-      'config.json — Customizable sorting rules',
-      'build_mac.sh — Build script for macOS',
-      'README.txt — Quick start guide',
-    ],
-    note: 'Source tarball · macOS 11+ · x64 & Apple Silicon',
-    sysReqs: {
-      OS: 'macOS 11 (Big Sur)+',
-      Architecture: 'x64 & Apple Silicon',
-      Dependencies: 'FLTK (brew install fltk)',
-      'Install type': 'Build from source',
-    },
-    usageCli: ['brew install fltk', 'chmod +x build_mac.sh', './build_mac.sh && ./urfm ~/Downloads --dry-run'],
-  },
 ]
 
 export function formatBytes(bytes) {

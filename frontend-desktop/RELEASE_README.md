@@ -6,11 +6,15 @@ Windows
   GUI:  Double-click run.bat
   CLI:  organizer.bat C:\Downloads --dry-run
 
-Linux / macOS
--------------
-  Build first (see build.sh or build_mac.sh), then:
+Linux
+-----
+  Build first (see build.sh), then:
   CLI:  ./urfm ~/Downloads --dry-run
 
+macOS
+-----
+  You rich Mac kids have it already! (check your system :D)
+  
 Options
 -------
   --dry-run    Preview moves without changing files (default in GUI)

@@ -1,4 +1,4 @@
-// gui_fltk.cpp - Cross-platform GUI for urFileManager (Linux & macOS)
+// gui_fltk.cpp - Cross-platform GUI for urFileManager (Linux)
 // Build: g++ -std=c++17 -O2 gui_fltk.cpp core.cpp -o urfm $(fltk-config --cxxflags --ldflags) -lpthread
 #include <FL/Fl.H>
 #include <FL/Fl_Double_Window.H>
@@ -23,6 +23,7 @@
 #include <string>
 #include <sstream>
 #include <algorithm>
+#include <iostream>
 
 #include "core.h"
 

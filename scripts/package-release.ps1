@@ -56,23 +56,6 @@ Pop-Location
 Remove-Item $LinuxStage -Recurse -Force
 Write-Host "  Created: urfm-linux.tar.gz" -ForegroundColor Green
 
-# ── macOS: source tarball with build_mac.sh ────────────────────────────
-Write-Host "`n[macOS] Packaging source tarball..." -ForegroundColor Yellow
-$MacStage = Join-Path $env:TEMP "urfm-mac-stage-$(Get-Random)"
-New-Item -ItemType Directory -Path $MacStage -Force | Out-Null
-foreach ($f in @("core.cpp", "core.h", "gui_fltk.cpp", "build_mac.sh")) {
-    Copy-Item (Join-Path $DesktopDir $f) $MacStage
-}
-Copy-Item $ConfigFile $MacStage
-Copy-Item (Join-Path $DesktopDir "RELEASE_README.txt") (Join-Path $MacStage "README.txt")
-
-$MacTar = Join-Path $PublicDir "urfm-macos.tar.gz"
-Push-Location $MacStage
-tar -czf $MacTar *
-Pop-Location
-Remove-Item $MacStage -Recurse -Force
-Write-Host "  Created: urfm-macos.tar.gz" -ForegroundColor Green
-
 # ── Manifest for the website ───────────────────────────────────────────
 $Manifest = @{
     version = "1.0.0"
@@ -80,7 +63,6 @@ $Manifest = @{
     files = @(
         @{ name = "urfm-windows.zip"; platform = "windows"; size = (Get-Item (Join-Path $PublicDir "urfm-windows.zip")).Length }
         @{ name = "urfm-linux.tar.gz"; platform = "linux"; size = (Get-Item (Join-Path $PublicDir "urfm-linux.tar.gz")).Length }
-        @{ name = "urfm-macos.tar.gz"; platform = "mac"; size = (Get-Item (Join-Path $PublicDir "urfm-macos.tar.gz")).Length }
     )
 }
 $Manifest | ConvertTo-Json -Depth 3 | Set-Content (Join-Path $PublicDir "downloads.json") -Encoding UTF8

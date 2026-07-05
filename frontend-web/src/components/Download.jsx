@@ -12,7 +12,6 @@ import {
 const platformIcons = {
   windows: IconWindows,
   linux: IconDownload,
-  mac: IconDownload,
 }
 
 function CopyButton({ text, label }) {
@@ -69,7 +68,7 @@ export default function Download() {
   const cliTabs = [
     { id: 'powershell', label: 'PowerShell' },
     { id: 'cmd', label: 'CMD (curl)' },
-    { id: 'bash', label: 'Bash / macOS' },
+    { id: 'bash', label: 'Bash' },
     { id: 'wget', label: 'wget' },
   ]
 
@@ -78,9 +77,9 @@ export default function Download() {
       <div className="container">
         <div className="download-header">
           <span className="section-label" style={{color:"var(--primary)",fontSize:"1.0rem"}}>Download</span>
-          <h2 className="section-title">Available for all platforms</h2>
+          <h2 className="section-title">Available for Windows & Linux</h2>
           <p className="section-subtitle">
-            Native C++ performance on Windows, Linux, and macOS. No runtime required.
+            Native C++ performance on Windows and Linux. No runtime required.
             {manifest?.generated && (
               <span className="manifest-date">
                 {' '}

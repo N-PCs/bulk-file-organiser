@@ -2,7 +2,7 @@
 
 A cross-platform, native C++ utility that organizes cluttered folders into categorized subdirectories — Images, Documents, Audio, Video, Archives — in seconds. Comes with a polished GUI, CLI mode, dry-run preview, PDF reports, and 5 stunning themes.
 
-**Platforms:** Windows (native Win32 GUI) · Linux (FLTK GUI) · macOS (FLTK GUI)
+**Platforms:** Windows (native Win32 GUI) · Linux (FLTK GUI)
 
 ## Features
 
@@ -23,12 +23,11 @@ A cross-platform, native C++ utility that organizes cluttered folders into categ
 │   └── public/
 ├── frontend-desktop/          # Desktop GUI applications
 │   ├── gui_win32.cpp          # Windows native Win32 GUI (C++)
-│   ├── gui_fltk.cpp           # Cross-platform FLTK GUI (C++, Linux/macOS)
+│   ├── gui_fltk.cpp           # Cross-platform FLTK GUI (C++, Linux)
 │   ├── gui.cpp                # GUI redirect (platform dispatch)
 │   ├── core.h / core.cpp      # Shared cross-platform logic
 │   ├── build.bat              # Windows build script
 │   ├── build.sh               # Linux build script
-│   ├── build_mac.sh           # macOS build script
 │   ├── organizer.bat          # Windows CLI wrapper
 │   ├── run.bat                # Windows GUI launcher
 │   ├── organizer.rc           # Windows resource file
@@ -77,18 +76,6 @@ chmod +x build.sh
 ./urfm ~/Downloads --dry-run
 ```
 
-### macOS
-
-```bash
-# Install FLTK via Homebrew
-brew install fltk
-
-# Build and run
-chmod +x build_mac.sh
-./build_mac.sh
-./urfm ~/Downloads --dry-run
-```
-
 ## Building from Source
 
 ### Windows (native Win32 GUI)
@@ -106,14 +93,6 @@ build.bat
 cd frontend-desktop
 chmod +x build.sh
 ./build.sh
-```
-
-### macOS (FLTK GUI)
-
-```bash
-cd frontend-desktop
-chmod +x build_mac.sh
-./build_mac.sh
 ```
 
 ### Python (cross-platform CLI)

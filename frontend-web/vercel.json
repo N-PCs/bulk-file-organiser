@@ -17,14 +17,6 @@
         { "key": "Content-Disposition", "value": "attachment; filename=\"urfm-linux.tar.gz\"" },
         { "key": "Cache-Control", "value": "public, max-age=3600" }
       ]
-    },
-    {
-      "source": "/urfm-macos.tar.gz",
-      "headers": [
-        { "key": "Content-Type", "value": "application/gzip" },
-        { "key": "Content-Disposition", "value": "attachment; filename=\"urfm-macos.tar.gz\"" },
-        { "key": "Cache-Control", "value": "public, max-age=3600" }
-      ]
     }
   ]
 }
