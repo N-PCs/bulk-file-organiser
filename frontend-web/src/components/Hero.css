@@ -16,7 +16,15 @@
   position: relative;
   z-index: 1;
   text-align: center;
-  padding: 120px 16px 96px;
+  padding: 50px 16px 25px;
+}
+
+@media (min-width: 641px) {
+  .hero-layout {
+    background: rgba(10, 10, 12, 0.6);
+    backdrop-filter: blur(8px);
+    border-radius: 5%;
+  }
 }
 
 .hero-eyebrow {
