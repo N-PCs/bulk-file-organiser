@@ -52,23 +52,23 @@ const themes = [
     },
   },
   {
-    name: 'Nordic Frost',
-    colors: ['#eceff4', '#d8dee9', '#5e81ac'],
+    name: 'Red Sakura',
+    colors: ['#ffffff', '#ffb7c5', '#de3163'],
     vars: {
-      '--bg': '#eef0f4',
-      '--bg-white': '#ffffff',
-      '--bg-muted': '#e2e5eb',
-      '--border': '#d8dee9',
-      '--border-strong': '#c0c7d4',
-      '--text': '#2e3440',
-      '--text-secondary': '#5e686f',
-      '--text-muted': '#8f9ba8',
-      '--primary': '#4c566a',
-      '--primary-hover': '#3b4252',
-      '--secondary': '#5e81ac',
-      '--accent': '#81a1c1',
-      '--accent-bg': '#e5edf5',
-      '--accent-soft': '#d8dee9',
+      '--bg': '#ffffff',
+      '--bg-white': '#fff5f7',
+      '--bg-muted': '#ffe8ef',
+      '--border': '#ffd6e0',
+      '--border-strong': '#ffb7c5',
+      '--text': '#333333',
+      '--text-secondary': '#666666',
+      '--text-muted': '#999999',
+      '--primary': '#de3163',
+      '--primary-hover': '#c42958',
+      '--secondary': '#ff6b8a',
+      '--accent': '#ffb7c5',
+      '--accent-bg': '#fff0f3',
+      '--accent-soft': '#ffe0ea',
     },
   },
   {
@@ -109,6 +109,26 @@ const themes = [
       '--accent': '#a78bfa',
       '--accent-bg': '#2e1065',
       '--accent-soft': '#3b0764',
+    },
+  },
+  {
+    name: 'Obsidian Volt',
+    colors: ['#0a0a0c', '#121214', '#dcf365'],
+    vars: {
+      '--bg': '#0a0a0c',
+      '--bg-white': '#121214',
+      '--bg-muted': '#1a1a1e',
+      '--border': '#1e1e24',
+      '--border-strong': '#2c2c35',
+      '--text': '#fbfbfb',
+      '--text-secondary': '#cbcdd5',
+      '--text-muted': '#8d8d8f',
+      '--primary': '#dcf365',
+      '--primary-hover': '#cbe24e',
+      '--secondary': '#fbfbfb',
+      '--accent': '#e8ff6b',
+      '--accent-bg': '#1c1d15',
+      '--accent-soft': '#282a1a',
     },
   },
 ]
@@ -219,7 +239,7 @@ export default function Themes() {
         <div className="themes-layout">
           <div className="themes-text">
             <span className="section-label" style={{color:"var(--primary)",fontSize:"1.0rem"}}>Themes</span>
-            <h2 className="section-title">Five interfaces, one engine</h2>
+            <h2 className="section-title">Six interfaces, one engine</h2>
             <p className="section-subtitle">
               {isMobile
                 ? 'Tap any theme to apply it. Scroll away to revert.'

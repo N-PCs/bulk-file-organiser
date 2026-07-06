@@ -48,9 +48,9 @@ const features = [
   },
   {
     Icon: IconPalette,
-    title: 'Five UI Themes',
+    title: 'Six UI Themes',
     description:
-      'Minimalist Light, Midnight Dark, Nordic Frost, Forest Emerald, Neon Cyberpunk. Switch themes from within the app.',
+      'Minimalist Light, Midnight Dark, Red Sakura, Forest Emerald, Neon Cyberpunk, Obsidian Volt. Switch themes from within the app.',
     tag: 'UI',
   },
   {

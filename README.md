@@ -1,6 +1,6 @@
 # urFileManager (urFM)
 
-A cross-platform, native C++ utility that organizes cluttered folders into categorized subdirectories — Images, Documents, Audio, Video, Archives — in seconds. Comes with a polished GUI, CLI mode, dry-run preview, PDF reports, and 5 stunning themes.
+A cross-platform, native C++ utility that organizes cluttered folders into categorized subdirectories — Images, Documents, Audio, Video, Archives — in seconds. Comes with a polished GUI, CLI mode, dry-run preview, PDF reports, and 6 stunning themes.
 
 **Platforms:** Windows (native Win32 GUI) · Linux (FLTK GUI)
 
@@ -11,7 +11,7 @@ A cross-platform, native C++ utility that organizes cluttered folders into categ
 - **PDF Reports** — Generate detailed organization reports with file names, sizes, and status
 - **Full Audit Logging** — Every action recorded in `organizer.log` with timestamps
 - **Conflict Resolution** — Duplicates renamed automatically (e.g. `report (1).pdf`)
-- **Five UI Themes** — Midnight Dark, Minimalist Light, Nordic Frost, Forest Emerald, Neon Cyberpunk
+- **Six UI Themes** — Midnight Dark, Minimalist Light, Red Sakura, Forest Emerald, Neon Cyberpunk, Obsidian Volt
 - **Editable Config** — Add file types or categories via `config.json` — no recompile needed
 - **GUI + CLI Modes** — Double-click for the GUI, or pass a folder path for scripting
 
