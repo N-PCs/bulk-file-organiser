@@ -13,20 +13,20 @@ Write-Host "=== urFileManager Release Packager ===" -ForegroundColor Cyan
 
 # ── Windows: build EXE and package into ZIP ────────────────────────────
 Write-Host "`n[Windows] Packaging..." -ForegroundColor Yellow
-$ExePath = Join-Path $DesktopDir "organizer.exe"
+$ExePath = Join-Path $DesktopDir "ufmgr.exe"
 if (-not (Test-Path $ExePath)) {
-    Write-Host "  Building organizer.exe..." -ForegroundColor Yellow
+    Write-Host "  Building ufmgr.exe..." -ForegroundColor Yellow
     Push-Location $DesktopDir
     & cmd /c "build.bat"
     Pop-Location
     if (-not (Test-Path $ExePath)) {
-        Write-Error "  Build failed - organizer.exe still missing."
+        Write-Error "  Build failed - ufmgr.exe still missing."
     }
 }
 
 $WinStage = Join-Path $env:TEMP "urfm-win-stage-$(Get-Random)"
 New-Item -ItemType Directory -Path $WinStage -Force | Out-Null
-foreach ($f in @("organizer.exe", "run.bat", "organizer.bat")) {
+foreach ($f in @("ufmgr.exe", "run.bat", "ufmgr.bat")) {
     Copy-Item (Join-Path $DesktopDir $f) $WinStage
 }
 Copy-Item $ConfigFile $WinStage

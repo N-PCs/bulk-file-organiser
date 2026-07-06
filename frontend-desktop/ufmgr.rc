@@ -1,10 +1,10 @@
 #include <windows.h>
 
 // Application Icon
-1 ICON "organizer.ico"
+1 ICON "ufmgr.ico"
 
 // Link Manifest
-1 24 "organizer.manifest"
+1 24 "ufmgr.manifest"
 
 // Version Information Block
 VS_VERSION_INFO VERSIONINFO
@@ -27,9 +27,9 @@ BEGIN
             VALUE "CompanyName", "Antigravity Dev"
             VALUE "FileDescription", "urFileManager C++ Native GUI Utility"
             VALUE "FileVersion", "1.0.0.0"
-            VALUE "InternalName", "organizer"
+            VALUE "InternalName", "ufmgr"
             VALUE "LegalCopyright", "Copyright (C) 2026"
-            VALUE "OriginalFilename", "organizer.exe"
+            VALUE "OriginalFilename", "ufmgr.exe"
             VALUE "ProductName", "urFileManager"
             VALUE "ProductVersion", "1.0.0.0"
         END

@@ -4,7 +4,7 @@ urFileManager (urFM) — Quick Start
 Windows
 -------
   GUI:  Double-click run.bat
-  CLI:  organizer.bat C:\Downloads --dry-run
+  CLI:  ufmgr.bat C:\Downloads --dry-run
 
 Linux
 -----

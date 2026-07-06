@@ -28,10 +28,10 @@ A cross-platform, native C++ utility that organizes cluttered folders into categ
 │   ├── core.h / core.cpp      # Shared cross-platform logic
 │   ├── build.bat              # Windows build script
 │   ├── build.sh               # Linux build script
-│   ├── organizer.bat          # Windows CLI wrapper
+│   ├── ufmgr.bat              # Windows CLI wrapper
 │   ├── run.bat                # Windows GUI launcher
-│   ├── organizer.rc           # Windows resource file
-│   └── organizer.manifest     # Windows manifest
+│   ├── ufmgr.rc               # Windows resource file
+│   └── ufmgr.manifest         # Windows manifest
 ├── organizer.py               # Python CLI (cross-platform)
 ├── config.json                # Sorting rules configuration
 ├── scripts/                   # Release automation
@@ -60,7 +60,7 @@ curl -L -o urfm-windows.zip "https://urfilemanager.vercel.app/urfm-windows.zip"
 3. Double-click `run.bat` to launch the GUI, or use:
 
 ```powershell
-.\organizer.exe C:\Downloads --dry-run
+.\ufmgr.exe C:\Downloads --dry-run
 ```
 
 ### Linux (Fedora / Ubuntu / Arch)

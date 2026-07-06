@@ -224,7 +224,7 @@ const steps = [
     num: '01',
     title: 'Pick a folder',
     description: 'Launch urFileManager and select any cluttered directory — Downloads, Desktop, or a project folder.',
-    code: 'run.bat  ·  ./urfm  ·  organizer.bat <folder>',
+    code: 'run.bat  ·  ./urfm  ·  ufmgr.bat <folder>',
   },
   {
     num: '02',

@@ -200,7 +200,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int nShow) {
         if (!AttachConsole(ATTACH_PARENT_PROCESS)) AllocConsole();
         FILE* f; freopen_s(&f, "CONOUT$", "w", stdout); freopen_s(&f, "CONOUT$", "w", stderr); freopen_s(&f, "CONIN$", "r", stdin);
         std::wcout << L"\n  urFileManager CLI Organizer\n";
-        if (dir.empty()) { std::wcout << L"Usage: organizer.exe <directory> [--dry-run]\n"; return 1; }
+        if (dir.empty()) {             std::wcout << L"Usage: ufmgr.exe <directory> [--dry-run]\n"; return 1; }
         std::filesystem::path src(dir);
         if (!std::filesystem::exists(src) || !std::filesystem::is_directory(src)) { std::wcout << L"Invalid directory\n"; return 1; }
         wchar_t exe[MAX_PATH]; GetModuleFileNameW(NULL, exe, MAX_PATH);
@@ -257,20 +257,13 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int nShow) {
     RegisterClassW(&wc);
 
     RECT rc = {0,0,SX(740),SY(580)}; AdjustWindowRect(&rc, WS_OVERLAPPED|WS_CAPTION|WS_SYSMENU|WS_MINIMIZEBOX, FALSE);
-    g_hMain = CreateWindowExW(WS_EX_NOREDIRECTIONBITMAP, L"UrFmWinGUI", L"urFileManager",
+    g_hMain = CreateWindowExW(0, L"UrFmWinGUI", L"urFileManager",
         WS_OVERLAPPED|WS_CAPTION|WS_SYSMENU|WS_MINIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT,
         rc.right-rc.left, rc.bottom-rc.top, NULL, NULL, hInst, NULL);
     if (!g_hMain) return 0;
 
     BOOL dark = TRUE;
     DwmSetWindowAttribute(g_hMain, 20, &dark, sizeof(dark));
-    int backdropType = 2;
-    DwmSetWindowAttribute(g_hMain, 38, &backdropType, sizeof(backdropType));
-    BOOL useMica = TRUE;
-    DwmSetWindowAttribute(g_hMain, 1029, &useMica, sizeof(useMica));
-
-    MARGINS m = {-1,-1,-1,-1};
-    DwmExtendFrameIntoClientArea(g_hMain, &m);
     ShowWindow(g_hMain, nShow); UpdateWindow(g_hMain);
     MSG msg; while (GetMessage(&msg, NULL, 0, 0)) { TranslateMessage(&msg); DispatchMessage(&msg); }
     CoUninitialize(); return 0;
@@ -354,7 +347,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
         std::wstring json = ReadFile(std::filesystem::path(exe).parent_path() / "config.json");
         g_fileTypeMap = ParseCfg(json);
         if (g_fileTypeMap.empty()) {
-            AppendLog(L"[ERROR] config.json not found or invalid. Place it next to organizer.exe.");
+            AppendLog(L"[ERROR] config.json not found or invalid. Place it next to ufmgr.exe.");
             EnableWindow(g_hAction, FALSE);
         } else {
             AppendLog(L"urFileManager v1.0");

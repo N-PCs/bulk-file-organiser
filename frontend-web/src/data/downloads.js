@@ -8,10 +8,10 @@ export const platforms = [
     archiveType: 'zip',
     description: 'Native Win32 GUI — no dependencies, no admin rights required.',
     contents: [
-      'organizer.exe — Native Windows application',
+      'ufmgr.exe — Native Windows application',
       'config.json — Customizable sorting rules',
       'run.bat — Launch the GUI instantly',
-      'organizer.bat — CLI wrapper for scripting',
+      'ufmgr.bat — CLI wrapper for scripting',
       'README.txt — Quick start guide',
     ],
     note: 'Portable ZIP · Windows 10 or later · x64',
@@ -21,7 +21,7 @@ export const platforms = [
       Dependencies: 'None',
       'Install type': 'Portable',
     },
-    usageCli: ['.\\run.bat', '.\\organizer.bat C:\\Downloads --dry-run'],
+    usageCli: ['.\\run.bat', '.\\ufmgr.bat C:\\Downloads --dry-run'],
   },
   {
     id: 'linux',

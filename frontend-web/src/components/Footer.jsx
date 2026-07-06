@@ -67,7 +67,7 @@ export default function Footer() {
         <p className="footer-copy">
           © {new Date().getFullYear()} urFileManager. Native C++, fully offline, no tracking.
           <span className="footer-credit">
-            {' '}Made with ❤️ by{' '}
+            {' '}Made with 💛 by{' '}
             <a href="https://github.com/N-PCs" target="_blank" rel="noopener noreferrer">
               N-PCs
             </a>
