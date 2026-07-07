@@ -21,7 +21,7 @@ A cross-platform, native C++ utility that organizes cluttered folders into categ
 ├── frontend-web/              # React + Vite marketing site
 │   ├── src/
 │   └── public/
-├── frontend-desktop/          # Desktop GUI applications
+├── desktop-windows/          # Desktop GUI applications
 │   ├── gui_win32.cpp          # Windows native Win32 GUI (C++)
 │   ├── gui_fltk.cpp           # Cross-platform FLTK GUI (C++, Linux)
 │   ├── gui.cpp                # GUI redirect (platform dispatch)
@@ -32,7 +32,7 @@ A cross-platform, native C++ utility that organizes cluttered folders into categ
 │   ├── run.bat                # Windows GUI launcher
 │   ├── ufmgr.rc               # Windows resource file
 │   └── ufmgr.manifest         # Windows manifest
-├── frontend-desktop-java/     # Linux Java Swing GUI (terminal aesthetic)
+├── desktop-linux/                # Linux Java Swing GUI (terminal aesthetic)
 │   ├── src/urfm/              # Java sources
 │   ├── build.sh               # Java build script
 │   ├── MANIFEST.MF            # JAR manifest
@@ -88,7 +88,7 @@ sudo apt install libfltk1.3-dev   # Ubuntu
 sudo dnf install fltk-devel       # Fedora
 
 # Build and run
-cd frontend-desktop
+cd desktop-windows
 chmod +x build.sh
 ./build.sh
 ./urfm ~/Downloads --dry-run
@@ -101,14 +101,14 @@ chmod +x build.sh
 Requires MinGW-w64 with `windres`.
 
 ```cmd
-cd frontend-desktop
+cd desktop-windows
 build.bat
 ```
 
 ### Linux — Java Terminal Edition
 
 ```bash
-cd frontend-desktop-java
+cd desktop-linux
 chmod +x build.sh
 ./build.sh
 # Produces urfm.jar + urfm launcher
@@ -117,7 +117,7 @@ chmod +x build.sh
 ### Linux — FLTK GUI (alternative)
 
 ```bash
-cd frontend-desktop
+cd desktop-windows
 chmod +x build.sh
 ./build.sh
 ```

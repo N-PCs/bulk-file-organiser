@@ -23,7 +23,7 @@ sudo apt install openjdk-17-jre   # Ubuntu
 sudo dnf install java-17-openjdk  # Fedora
 
 # 2. Build & run
-cd frontend-desktop-java
+cd desktop-linux
 chmod +x build.sh
 ./build.sh
 ./urfm                           # opens GUI (terminal aesthetic)
@@ -38,7 +38,7 @@ sudo apt install libfltk1.3-dev   # Ubuntu
 sudo dnf install fltk-devel       # Fedora
 
 # 2. Build & run
-cd frontend-desktop
+cd desktop-windows
 chmod +x build.sh
 ./build.sh
 ./urfm                           # opens GUI

@@ -3,7 +3,7 @@
 
 $ErrorActionPreference = "Stop"
 $Root = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
-$DesktopDir = Join-Path $Root "frontend-desktop"
+$DesktopDir = Join-Path $Root "desktop-windows"
 $PublicDir = Join-Path $Root "frontend-web\public"
 $ConfigFile = Join-Path $Root "config.json"
 
@@ -41,7 +41,7 @@ Write-Host "  Created: urfm-windows.zip - $SizeMb MB" -ForegroundColor Green
 
 # ── Linux: Java JAR package ────────────────────────────────────────────
 Write-Host "`n[Linux] Building Java JAR..." -ForegroundColor Yellow
-$JavaDir = Join-Path $Root "frontend-desktop-java"
+$JavaDir = Join-Path $Root "desktop-linux"
 $JavaJar = Join-Path $JavaDir "urfm.jar"
 if (-not (Test-Path $JavaJar)) {
     Write-Host "  Building urfm.jar..." -ForegroundColor Yellow
