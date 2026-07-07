@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # organizer.py
 
 """
@@ -18,8 +19,13 @@ import pathlib
 import shutil
 import sys
 
-# Third-party imports
-from tqdm import tqdm
+# Third-party imports (tqdm is optional; falls back to a simple progress indicator)
+try:
+    from tqdm import tqdm
+except ImportError:
+    tqdm = None
+
+VERSION = "1.0.0"
 
 
 def load_config(config_path: pathlib.Path) -> dict:
@@ -341,7 +347,11 @@ def organize_directory(
     moved_files = []
     undo_log = []
 
-    for file_item in tqdm(files_to_process, desc="Organizing Files"):
+    if tqdm is not None:
+        iterator = tqdm(files_to_process, desc="Organizing Files")
+    else:
+        iterator = files_to_process
+    for file_item in iterator:
         res = process_file(file_item, source_path, file_type_map, dry_run, undo_log)
         moved_files.append(res)
 
@@ -409,7 +419,7 @@ if __name__ == "__main__":
         epilog="Example: python organizer.py /path/to/downloads",
     )
     parser.add_argument(
-        "source_directory", help="The path to the directory you want to organize."
+        "source_directory", nargs="?", help="The path to the directory you want to organize."
     )
     parser.add_argument(
         "--dry-run",
@@ -421,6 +431,11 @@ if __name__ == "__main__":
         action="store_true",
         help="Revert a previous organization using the saved undo log.",
     )
+    parser.add_argument(
+        "--version",
+        action="store_true",
+        help="Show version and exit.",
+    )
     args = parser.parse_args()
 
     logging.basicConfig(
@@ -429,9 +444,15 @@ if __name__ == "__main__":
         handlers=[logging.FileHandler("organizer.log"), logging.StreamHandler(sys.stdout)],
     )
 
+    if args.version:
+        print(f"urFileManager Python CLI v{VERSION}")
+        sys.exit(0)
+
+    if not args.source_directory:
+        parser.print_help()
+        sys.exit(1)
+
     # Build a robust path to config.json, ensuring it's found in the same directory as the script.
-    # `__file__` is a special variable that holds the path to the current script.
-    # `.parent` gets the directory containing the script.
     config_file_path = pathlib.Path(__file__).parent / "config.json"
 
     file_type_map_from_config = load_config(config_file_path)
