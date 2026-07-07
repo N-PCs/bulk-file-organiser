@@ -36,8 +36,28 @@ chmod +x urfm
 sudo dnf install ./urfm-1.0.0-1.noarch.rpm
 
 # 2. Run globally from anywhere
-urfm                           # Opens GUI
-urfm /path/to/folder --dry-run # Runs in CLI mode
+urfm                                # Launch GUI
+urfm /path/to/folder --dry-run     # Preview organization
+urfm /path/to/folder                # Run organization
+urfm /path/to/folder --revert       # Undo last run
+urfm --version                      # Show version
+urfm --gui                          # Force open GUI
+```
+
+### Ubuntu DEB Package (Linux Ubuntu/Debian)
+
+```bash
+# 1. Install the downloaded DEB
+sudo dpkg -i ./urfm_1.0.0_all.deb
+sudo apt install -f                 # Fix any missing dependencies
+
+# 2. Run globally from anywhere
+urfm                                # Launch GUI
+urfm /path/to/folder --dry-run     # Preview organization
+urfm /path/to/folder                # Run organization
+urfm /path/to/folder --revert       # Undo last run
+urfm --version                      # Show version
+urfm --gui                          # Force open GUI
 ```
 
 ### C++ GUI (Windows)
@@ -96,10 +116,16 @@ python organizer.py ~/Downloads --revert
 
 ## Java CLI Reference (Linux `urfm`)
 
-The `urfm` command-line interface is available via the launcher script in the tarball, or globally if installed via the Fedora RPM package.
+The `urfm` command-line interface is available via the launcher script in the tarball, or globally if installed via the Fedora RPM or Ubuntu DEB package.
 
 ```bash
-usage: urfm <directory> [--dry-run] [--revert] [--version]
+usage: urfm <directory> [--dry-run] [--revert] [--version] [--gui]
+
+# Launch GUI (no args)
+urfm
+
+# Force GUI mode (ignores directory arg)
+urfm --gui
 
 # Preview
 urfm ~/Downloads --dry-run
@@ -109,6 +135,9 @@ urfm ~/Downloads
 
 # Revert
 urfm ~/Downloads --revert
+
+# Show version
+urfm --version
 ```
 
 ## C++ CLI Reference (Linux FLTK `urfm`)

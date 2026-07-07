@@ -2,7 +2,7 @@
 
 A cross-platform utility that organizes cluttered folders into categorized subdirectories — Images, Documents, Audio, Video, Archives — in seconds. Comes with a polished GUI, CLI mode, dry-run preview, PDF reports, and customizable console themes.
 
-**Platforms:** Windows (Native C++ Win32 GUI) · Linux (Java Swing GUI with Fedora RPM support)
+**Platforms:** Windows (Native C++ Win32 GUI) · Linux (Java Swing GUI with Fedora RPM & Ubuntu DEB support)
 
 ## Features
 
@@ -80,7 +80,33 @@ sudo dnf install ./urfm-1.0.0-1.noarch.rpm
 3. Run it from the application menu, or via terminal:
 
 ```bash
-urfm ~/Downloads --dry-run
+urfm                           # Launch GUI
+urfm ~/Downloads --dry-run    # Preview organization
+urfm ~/Downloads               # Run organization
+urfm ~/Downloads --revert      # Undo last run
+urfm --version                 # Show version
+urfm --gui                     # Force open GUI (even with a directory arg)
+```
+
+### Linux (Ubuntu DEB)
+
+1. Download the `urfm_1.0.0_all.deb` package.
+2. Install the package:
+
+```bash
+sudo dpkg -i ./urfm_1.0.0_all.deb
+sudo apt install -f            # Fix any missing dependencies
+```
+
+3. Run it from the application menu, or via terminal:
+
+```bash
+urfm                           # Launch GUI
+urfm ~/Downloads --dry-run    # Preview organization
+urfm ~/Downloads               # Run organization
+urfm ~/Downloads --revert      # Undo last run
+urfm --version                 # Show version
+urfm --gui                     # Force open GUI (even with a directory arg)
 ```
 
 ### Linux (Java Tarball)
@@ -97,7 +123,12 @@ sudo dnf install java-17-openjdk  # Fedora
 
 ```bash
 chmod +x urfm
-./urfm ~/Downloads --dry-run
+./urfm                           # Launch GUI
+./urfm ~/Downloads --dry-run    # Preview organization
+./urfm ~/Downloads               # Run organization
+./urfm ~/Downloads --revert      # Undo last run
+./urfm --version                 # Show version
+./urfm --gui                     # Force open GUI (even with a directory arg)
 ```
 
 ## Building from Source

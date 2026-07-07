@@ -62,6 +62,7 @@ export default function Footer() {
           <a href="#how-it-works">How it works</a>
           <a href="#themes">Themes</a>
           <a href="#download">Download</a>
+          <a href="https://github.com/N-PCs/urFileManager" target="_blank" rel="noopener noreferrer">GitHub</a>
         </div>
 
         <p className="footer-copy">

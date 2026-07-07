@@ -3,7 +3,7 @@ Version:        1.0.0
 Release:        1%{?dist}
 Summary:        urFileManager - Terminal-aesthetic bulk file organizer GUI and CLI
 License:        MIT
-URL:            https://github.com/N-PCs/bulk-file-organiser
+URL:            https://github.com/N-PCs/urFileManager
 BuildArch:      noarch
 Requires:       (java-17-openjdk-headless or java-21-openjdk-headless or java-11-openjdk-headless or java-latest-openjdk-headless)
 

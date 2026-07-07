@@ -196,6 +196,11 @@ public class UrfmGUI extends JFrame {
 
         add(tabbedPane);
 
+        JLabel footerLabel = new JLabel("github.com/N-PCs/urFileManager");
+        footerLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        footerLabel.setFont(new Font("Monospaced", Font.PLAIN, 10));
+        add(footerLabel, BorderLayout.SOUTH);
+
         // Setup event handlers
         organizeBtn.addActionListener(e -> startOrganization());
         revertBtn.addActionListener(e -> startRevert());
