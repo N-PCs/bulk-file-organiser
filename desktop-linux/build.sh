@@ -50,7 +50,7 @@ rm -rf "$OUT_DIR"
 mkdir -p "$OUT_DIR"
 
 echo "[2/6] Compiling Java sources..."
-$JAVAC -d "$OUT_DIR" $(find "$SRC_DIR" -name "*.java")
+$JAVAC --release 17 -d "$OUT_DIR" $(find "$SRC_DIR" -name "*.java")
 
 echo "[3/6] Creating executable JAR..."
 cd "$OUT_DIR"

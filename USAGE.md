@@ -15,34 +15,29 @@ python organizer.py /path/to/folder --dry-run
 python organizer.py /path/to/folder
 ```
 
-### Java GUI (Linux — recommended)
+### Java GUI (Linux Tarball)
 
 ```bash
-# 1. Install Java 17+
-sudo apt install openjdk-17-jre   # Ubuntu
-sudo dnf install java-17-openjdk  # Fedora
+# 1. Install Java 17+ runtime
+sudo apt install openjdk-17-jre   # Ubuntu/Debian
+sudo dnf install java-17-openjdk  # Fedora/RHEL
 
-# 2. Build & run
-cd desktop-linux
-chmod +x build.sh
-./build.sh
-./urfm                           # opens GUI (terminal aesthetic)
+# 2. Extract and run
+tar -xzf urfm-linux.tar.gz
+chmod +x urfm
+./urfm                           # Opens Swing GUI (terminal theme)
 ./urfm /path/to/folder --dry-run # CLI mode
 ```
 
-### C++ FLTK GUI (Linux — alternative)
+### Fedora RPM Package (Linux Fedora/RHEL)
 
 ```bash
-# 1. Install FLTK
-sudo apt install libfltk1.3-dev   # Ubuntu
-sudo dnf install fltk-devel       # Fedora
+# 1. Install the downloaded RPM
+sudo dnf install ./urfm-1.0.0-1.noarch.rpm
 
-# 2. Build & run
-cd desktop-windows
-chmod +x build.sh
-./build.sh
-./urfm                           # opens GUI
-./urfm /path/to/folder --dry-run # CLI mode
+# 2. Run globally from anywhere
+urfm                           # Opens GUI
+urfm /path/to/folder --dry-run # Runs in CLI mode
 ```
 
 ### C++ GUI (Windows)
@@ -101,17 +96,19 @@ python organizer.py ~/Downloads --revert
 
 ## Java CLI Reference (Linux `urfm`)
 
+The `urfm` command-line interface is available via the launcher script in the tarball, or globally if installed via the Fedora RPM package.
+
 ```bash
 usage: urfm <directory> [--dry-run] [--revert] [--version]
 
 # Preview
-./urfm ~/Downloads --dry-run
+urfm ~/Downloads --dry-run
 
 # Execute
-./urfm ~/Downloads
+urfm ~/Downloads
 
 # Revert
-./urfm ~/Downloads --revert
+urfm ~/Downloads --revert
 ```
 
 ## C++ CLI Reference (Linux FLTK `urfm`)
