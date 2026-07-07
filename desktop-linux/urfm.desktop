@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=urFileManager
+GenericName=File Organizer
+Comment=Organize files in a directory by type
+Exec=/usr/local/bin/urfm %F
+Icon=urfm
+Terminal=false
+Categories=Utility;FileTools;FileManager;
+StartupNotify=true
+MimeType=inode/directory;

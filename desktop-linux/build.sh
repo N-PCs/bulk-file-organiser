@@ -45,29 +45,60 @@ fi
 SRC_DIR="src"
 OUT_DIR="build"
 
-echo "[1/4] Cleaning previous build..."
+echo "[1/6] Cleaning previous build..."
 rm -rf "$OUT_DIR"
 mkdir -p "$OUT_DIR"
 
-echo "[2/4] Compiling Java sources..."
+echo "[2/6] Compiling Java sources..."
 $JAVAC -d "$OUT_DIR" $(find "$SRC_DIR" -name "*.java")
 
-echo "[3/4] Creating executable JAR..."
+echo "[3/6] Creating executable JAR..."
 cd "$OUT_DIR"
 jar cfm ../urfm.jar ../MANIFEST.MF urfm/*.class
 cd ..
 
-echo "[4/4] Making launcher script..."
+echo "[4/6] Making launcher script..."
 cat > urfm << 'LAUNCHER'
 #!/usr/bin/env bash
+# urfm — urFileManager launcher
 DIR="$(cd "$(dirname "$0")" && pwd)"
-exec java -jar "$DIR/urfm.jar" "$@"
+JAVA=""
+for candidate in java /usr/lib/jvm/java-17-openjdk/bin/java /usr/lib/jvm/java-11-openjdk/bin/java /usr/lib/jvm/java-21-openjdk/bin/java; do
+    if command -v "$candidate" &>/dev/null; then
+        JAVA="$candidate"
+        break
+    fi
+done
+if [ -z "$JAVA" ]; then
+    echo "Error: Java 17+ not found. Install with:"
+    echo "  Fedora: sudo dnf install java-17-openjdk"
+    echo "  Ubuntu: sudo apt install openjdk-17-jre"
+    echo "  Arch:   sudo pacman -S jre17-openjdk"
+    exit 1
+fi
+exec "$JAVA" -jar "$DIR/urfm.jar" "$@"
 LAUNCHER
 chmod +x urfm
 
+echo "[5/6] Copying desktop integration files..."
+cp urfm-icon.svg "$OUT_DIR/"
+cp urfm.desktop "$OUT_DIR/"
+
+echo "[6/6] Copying config.json example..."
+if [ -f ../config.json ]; then
+    cp ../config.json "$OUT_DIR/"
+fi
+
 echo ""
-echo "Build successful! Created 'urfm.jar' and launcher 'urfm'."
+echo "Build successful! Created in '$OUT_DIR/':"
+echo "  urfm.jar           — Java application"
+echo "  urfm               — Launcher script"
+echo "  urfm.desktop       — Desktop entry for app menu"
+echo "  urfm-icon.svg      — Application icon"
+echo "  config.json        — Organization rules"
 echo ""
-echo "Run: ./urfm                  (launches GUI)"
-echo "Run: ./urfm <directory> [--dry-run]  (CLI mode)"
+echo "Quick start:  ./urfm                  (GUI)"
+echo "              ./urfm ~/Downloads --dry-run  (CLI)"
+echo ""
+echo "Install system-wide: sudo bash install.sh"
 echo "=============================================="
