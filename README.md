@@ -14,6 +14,7 @@ A cross-platform utility that organizes cluttered folders into categorized subdi
 - **Six UI Themes** — Midnight Dark, Minimalist Light, Red Sakura, Forest Emerald, Neon Cyberpunk, Obsidian Volt
 - **Editable Config** — Add file types or categories via `config.json` — no recompile needed
 - **GUI + CLI Modes** — Double-click for the GUI, or pass a folder path for scripting
+- **Undo / Revert** — Revert the last organization (cleans up category folders and PDF reports)
 
 ## Project Structure
 
@@ -21,22 +22,26 @@ A cross-platform utility that organizes cluttered folders into categorized subdi
 ├── frontend-web/              # React + Vite marketing site
 │   ├── src/
 │   └── public/
-├── desktop-windows/          # Desktop GUI applications
-│   ├── gui_win32.cpp          # Windows native Win32 GUI (C++)
-│   ├── gui_fltk.cpp           # Cross-platform FLTK GUI (C++, Linux)
-│   ├── gui.cpp                # GUI redirect (platform dispatch)
-│   ├── core.h / core.cpp      # Shared cross-platform logic
-│   ├── build.bat              # Windows build script
-│   ├── build.sh               # Linux build script
-│   ├── ufmgr.bat              # Windows CLI wrapper
+├── desktop-windows/          # Windows C++ desktop apps
+│   ├── gui_app.cpp            # Windows native Win32 GUI (C++, builds ufmgr.exe)
+│   ├── cli.cpp                # Windows CLI (C++, builds ufmgr-cli.exe)
+│   ├── urfm_common.cpp/.h     # Shared engine (config, PDF report, revert)
+│   ├── build.bat              # Windows build script (MinGW-w64)
+│   ├── ufmgr.bat              # Windows CLI wrapper (forwards to ufmgr-cli.exe)
 │   ├── run.bat                # Windows GUI launcher
 │   ├── ufmgr.rc               # Windows resource file
-│   └── ufmgr.manifest         # Windows manifest
-├── desktop-linux/                # Linux Java Swing GUI (terminal aesthetic)
-│   ├── src/urfm/              # Java sources
+│   ├── ufmgr.ico              # Application icon
+│   └── windows_usage.md       # Windows usage guide
+├── desktop-linux/            # Linux Java Swing GUI (terminal aesthetic)
+│   ├── src/urfm/              # Java sources (Main, Cli, OrganizerEngine, UrfmGUI, ...)
 │   ├── build.sh               # Java build script
+│   ├── build-tarball.sh       # Portable tarball builder
+│   ├── build-rpm.sh           # Fedora RPM builder
+│   ├── build-deb.sh           # Ubuntu DEB builder
+│   ├── launcher.sh            # Launcher helper
+│   ├── urfm / urfm.jar        # Compiled launcher + application
 │   ├── MANIFEST.MF            # JAR manifest
-│   └── RELEASE_README.md      # Quick start
+│   └── linux_usage.md         # Linux usage guide
 ├── organizer.py               # Python CLI (cross-platform)
 ├── config.json                # Sorting rules configuration
 ├── scripts/                   # Release automation
@@ -65,7 +70,17 @@ curl -L -o urfm-windows.zip "https://urfilemanager.vercel.app/urfm-windows.zip"
 3. Double-click `run.bat` to launch the GUI, or use:
 
 ```powershell
-.\ufmgr.exe C:\Downloads --dry-run
+# GUI launcher
+.\ufmgr.exe
+
+# CLI — preview (dry-run is the default)
+.\ufmgr-cli.exe C:\Downloads
+
+# CLI — actually move files
+.\ufmgr-cli.exe C:\Downloads --no-dry-run
+
+# CLI — undo a previous organization
+.\ufmgr-cli.exe --revert C:\Downloads
 ```
 
 ### Linux (Fedora RPM — recommended)
@@ -151,12 +166,12 @@ chmod +x build.sh
 # Produces urfm.jar + urfm launcher
 ```
 
-### Linux — FLTK GUI (alternative)
+### Linux — RPM / DEB packaging
 
 ```bash
-cd desktop-windows
-chmod +x build.sh
-./build.sh
+cd desktop-linux
+./build-rpm.sh      # Fedora/RHEL (.rpm) — needs rpmbuild
+./build-deb.sh      # Ubuntu/Debian (.deb)
 ```
 
 ### Python (cross-platform CLI)
