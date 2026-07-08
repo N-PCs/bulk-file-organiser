@@ -1,4 +1,4 @@
-export const VERSION = '1.0.0'
+export const VERSION = '2.0.0'
 
 export const platforms = [
   {
@@ -9,7 +9,8 @@ export const platforms = [
     archiveType: 'zip',
     description: 'Native Win32 GUI — no dependencies, no admin rights required.',
     contents: [
-      'ufmgr.exe — Native Windows application',
+      'ufmgr.exe — Native Windows GUI',
+      'ufmgr-cli.exe — Command-line interface',
       'config.json — Customizable sorting rules',
       'run.bat — Launch the GUI instantly',
       'ufmgr.bat — CLI wrapper for scripting',
@@ -22,7 +23,7 @@ export const platforms = [
       Dependencies: 'None',
       'Install type': 'Portable',
     },
-    usageCli: ['.\\run.bat', '.\\ufmgr.bat C:\\Downloads --dry-run'],
+    usageCli: ['.\\run.bat          # Launch GUI', '.\\ufmgr.bat C:\\Downloads  # Preview (safe)', '.\\ufmgr.bat C:\\Downloads --no-dry-run  # Execute', '.\\ufmgr.bat --revert C:\\Downloads  # Undo'],
   },
   {
     id: 'linux',

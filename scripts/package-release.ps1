@@ -1,7 +1,7 @@
 # Package urFileManager for all platforms
 # Run from project root: .\scripts\package-release.ps1
 
-$ErrorActionPreference = "Stop"
+$ErrorActionPreference = "Continue"
 $Root = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
 $DesktopDir = Join-Path $Root "desktop-windows"
 $PublicDir = Join-Path $Root "frontend-web\public"
@@ -26,11 +26,11 @@ if (-not (Test-Path $ExePath)) {
 
 $WinStage = Join-Path $env:TEMP "urfm-win-stage-$(Get-Random)"
 New-Item -ItemType Directory -Path $WinStage -Force | Out-Null
-foreach ($f in @("ufmgr.exe", "run.bat", "ufmgr.bat")) {
+foreach ($f in @("ufmgr.exe", "ufmgr-cli.exe", "run.bat", "ufmgr.bat")) {
     Copy-Item (Join-Path $DesktopDir $f) $WinStage
 }
 Copy-Item $ConfigFile $WinStage
-Copy-Item (Join-Path $DesktopDir "RELEASE_README.md") (Join-Path $WinStage "README.txt")
+Copy-Item (Join-Path $DesktopDir "windows_usage.md") (Join-Path $WinStage "README.txt")
 
 $WinZip = Join-Path $PublicDir "urfm-windows.zip"
 if (Test-Path $WinZip) { Remove-Item $WinZip -Force }
@@ -71,7 +71,7 @@ Write-Host "  Created: urfm-linux.tar.gz" -ForegroundColor Green
 
 # ── Manifest for the website ───────────────────────────────────────────
 $Manifest = @{
-    version = "1.0.0"
+    version = "2.0.0"
     generated = (Get-Date -Format "yyyy-MM-ddTHH:mm:ssZ")
     files = @(
         @{ name = "urfm-windows.zip"; platform = "windows"; size = (Get-Item (Join-Path $PublicDir "urfm-windows.zip")).Length }
