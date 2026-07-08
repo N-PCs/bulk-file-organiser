@@ -38,8 +38,24 @@ void COut(CCol c, const std::wstring& s) {
     SetConsoleTextAttribute(h, old);
 }
 
-// std::wstring -> std::string helper (used when feeding data to the PDF writer).
-std::string W2S(const std::wstring& w) { return std::string(w.begin(), w.end()); }
+// std::wstring -> std::string helper using WideCharToMultiByte for correctness.
+std::string W2S(const std::wstring& w) {
+    if (w.empty()) return {};
+    int n = WideCharToMultiByte(CP_UTF8, 0, w.data(), (int)w.size(), NULL, 0, NULL, NULL);
+    if (n <= 0) return {};
+    std::string s(n, 0);
+    WideCharToMultiByte(CP_UTF8, 0, w.data(), (int)w.size(), s.data(), n, NULL, NULL);
+    return s;
+}
+// std::string -> std::wstring helper using MultiByteToWideChar for correctness.
+std::wstring S2W(const std::string& s) {
+    if (s.empty()) return {};
+    int n = MultiByteToWideChar(CP_UTF8, 0, s.data(), (int)s.size(), NULL, 0);
+    if (n <= 0) return {};
+    std::wstring w(n, 0);
+    MultiByteToWideChar(CP_UTF8, 0, s.data(), (int)s.size(), w.data(), n);
+    return w;
+}
 
 // Make sure we have a usable console and return true only when we had to
 // create a NEW one (so the caller can pause before exiting). If a console is
@@ -51,7 +67,7 @@ std::string W2S(const std::wstring& w) { return std::string(w.begin(), w.end());
 // console. We deliberately never call AllocConsole() because doing so on a
 // console-subsystem process is what crashed earlier.
 bool EnsureConsole() {
-    if (AttachConsole(ATTACH_PARENT_PROCESS)) return false; // attached to parent terminal
+    if (AttachConsole(ATTACH_PARENT_PROCESS)) return true;  // attached to parent terminal
     return false;                                            // no parent console; -mconsole will provide one
 }
 
@@ -165,6 +181,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int nShow) {
             if (alloc) { std::wcout << L"\n  Press any key to exit . . . "; _getwch(); std::wcout << L"\n"; }
             return 1;
         }
+        try {
         std::vector<std::filesystem::path> files;
         for (const auto& e : std::filesystem::directory_iterator(src)) if (e.is_regular_file()) files.push_back(e.path());
         size_t total = files.size();
@@ -186,11 +203,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int nShow) {
             uint64_t sz = 0;
             try { sz = std::filesystem::file_size(fp); } catch (...) {}
             if (dry) {
-                COut(CCol::Yellow, L"  [DRY-RUN] ");
-                COut(CCol::Def, fn + L"  ->  " + dest + L"/\n");
-                if (log.is_open()) log << L"DRY-RUN: " << fn << L" -> " << dest << L"/\n";
-                moved.push_back({ W2S(fn), W2S(dest), "Dry Run Preview", sz });
-                ok++;
+                try {
+                    COut(CCol::Yellow, L"  [DRY-RUN] ");
+                    COut(CCol::Def, fn + L"  ->  " + dest + L"/\n");
+                    if (log.is_open()) log << L"DRY-RUN: " << fn << L" -> " << dest << L"/\n";
+                    moved.push_back({ W2S(fn), W2S(dest), "Dry Run Preview", sz });
+                    ok++;
+                } catch (const std::exception& e) {
+                    std::wstring we = S2W(e.what());
+                    COut(CCol::Red, L"  [ERROR]   ");
+                    COut(CCol::Def, fn + L" - " + we + L"\n");
+                    moved.push_back({ W2S(fn), W2S(dest), "Error", sz });
+                }
             } else {
                 try {
                     std::filesystem::create_directories(dd);
@@ -204,7 +228,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int nShow) {
                     moved.push_back({ W2S(fn), W2S(dest), ctr > 1 ? "Renamed" : "Moved", sz });
                     ok++;
                 } catch (const std::exception& e) {
-                    std::wstring we(e.what(), e.what() + strlen(e.what()));
+                    std::wstring we = S2W(e.what());
                     COut(CCol::Red, L"  [ERROR]   ");
                     COut(CCol::Def, fn + L" - " + we + L"\n");
                     moved.push_back({ W2S(fn), W2S(dest), "Error", sz });
@@ -236,6 +260,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int nShow) {
             COut(CCol::BoldGreen, L"\n  ============================================\n");
             COut(CCol::BoldGreen, L"   DONE - Organized " + std::to_wstring(ok) + L"/" + std::to_wstring(total) + L" files\n");
             COut(CCol::BoldGreen, L"  ============================================\n");
+        }
+        } catch (const std::exception& e) {
+            COut(CCol::Red, L"\n  UNEXPECTED ERROR: " + S2W(e.what()) + L"\n");
+            COut(CCol::Def, L"  The operation may be incomplete.\n");
+        } catch (...) {
+            COut(CCol::Red, L"\n  UNEXPECTED FATAL ERROR\n");
         }
         if (alloc) { std::wcout << L"\n  Press any key to exit . . . "; _getwch(); std::wcout << L"\n"; }
         return 0;

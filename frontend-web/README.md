@@ -1,8 +1,8 @@
-# urFileManager Website
+# urFileManager — Website
 
-Marketing website for urFileManager — a cross-platform file organizer.
+Marketing site built with React + Vite.
 
-## Development
+## Dev
 
 ```sh
 npm install

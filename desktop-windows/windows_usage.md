@@ -1,108 +1,82 @@
 # urFileManager — Windows Usage Guide
 
-This guide covers the **two ways** you can use urFileManager on Windows, both of
-which live in the `desktop-windows` folder. They are two **separate programs**
-that share the same engine:
+Two programs share the same engine (`urfm_common.cpp`):
 
-1. **`ufmgr.exe` — the GUI launcher** (Graphical Interface). Double-click to use.
-2. **`ufmgr-cli.exe` — the Command Line Interface.** Run from a terminal with flags.
+- **`ufmgr.exe`** — GUI launcher (double-click to use)
+- **`ufmgr-cli.exe`** — command-line interface (run from terminal)
 
-> Tip: both programs read the `config.json` file next to them to decide how
-> files are sorted into categories (Images, Documents, Videos, etc.).
+Both read `config.json` from the same folder.
 
 ---
 
-## 1. The GUI Launcher (`ufmgr.exe`)
+## GUI (`ufmgr.exe`)
 
-The simplest way to use the tool — no commands required.
+1. Double-click `ufmgr.exe` (or `run.bat`).
+2. Click **Browse** and pick a folder.
+3. **Dry Run** is checked by default — uncheck to actually move files.
+4. Click **Start Organizing**.
+5. A PDF report is created in the organized folder.
+6. Click **Undo Last Organize** to revert.
 
-1. Make sure `ufmgr.exe` and `config.json` are in the same folder.
-2. **Double-click `ufmgr.exe`** (or run `run.bat`).
-3. In the window:
-   - Click **Browse** and pick the folder you want to organize.
-   - Tick **Dry Run** if you only want a preview (this is on by default).
-   - Click **Start Organizing** to move the files.
-   - When finished, a PDF report (`organization_report.pdf`) is created in the folder.
-4. To undo everything, click **Revert**. This moves the files back to their
-   original places, deletes the now-empty category folders, and removes the
-   generated PDF report.
-
-You can also theme the window and open the audit log (`organizer.log`) from the GUI.
+You can switch themes and view the audit log from the GUI.
 
 ---
 
-## 2. The Command Line Interface (`ufmgr-cli.exe`)
+## CLI (`ufmgr-cli.exe`)
 
-Open a terminal (Command Prompt or PowerShell) in the `desktop-windows` folder
-and run `ufmgr-cli.exe` with the options below. It prints coloured, easy-to-read
-output and produces the same PDF report as the GUI.
+Open a terminal in the `desktop-windows` folder:
 
-### Commands / Flags
+| Command | Description |
+|---------|-------------|
+| `ufmgr-cli.exe <folder>` | Preview organization (safe — no files moved) |
+| `ufmgr-cli.exe <folder> --no-dry-run` | Actually move files |
+| `ufmgr-cli.exe --revert <folder>` | Undo a previous organization |
+| `ufmgr-cli.exe -h` | Show help |
 
-| Command | What it does |
-| --- | --- |
-| `<folder>` | Organizes the given folder (preview only by default). |
-| `--dry-run` | Preview the moves, change nothing. **This is the CLI default.** |
-| `--no-dry-run` | Actually perform the file moves. |
-| `--revert <folder>` | Undo a previous organization: move files back to the folder root, delete the now-empty category folders, and delete the PDF report. |
-| `-h`, `--help` | Show the usage text with examples. |
-
-Both `--flag` and `-flag` spellings are accepted. (The dedicated GUI launcher
-is `ufmgr.exe`; `ufmgr-cli.exe` is console-only, so it points you to `ufmgr.exe`
-if launched without a folder.)
+Both `--flag` and `-flag` syntax are accepted.
 
 ### Examples
 
-Preview how a folder would be organized (nothing is moved):
-
 ```bat
+:: Preview (default)
 ufmgr-cli.exe "C:\Users\YourName\Downloads"
-```
 
-Actually organize the folder:
-
-```bat
+:: Execute
 ufmgr-cli.exe "C:\Users\YourName\Downloads" --no-dry-run
-```
 
-Reverse a previous organization (moves files back, removes empty folders + report):
-
-```bat
+:: Revert
 ufmgr-cli.exe --revert "C:\Users\YourName\Downloads"
-```
 
-More example folder locations you can use:
-
-```bat
-ufmgr-cli.exe "D:\Photos 2024"
-ufmgr-cli.exe "E:\Work\Inbox" --no-dry-run
+:: Other folders
+ufmgr-cli.exe "D:\Photos 2024" --no-dry-run
 ufmgr-cli.exe --revert "D:\Photos 2024"
-```
 
-Show the help text:
-
-```bat
+:: Help
 ufmgr-cli.exe -h
 ```
 
 ---
 
-## Building from source (optional)
+## Build from Source
 
-If you want to rebuild the programs yourself, run `build.bat` from the
-`desktop-windows` folder (requires MinGW-w64). It produces two binaries:
-- `ufmgr.exe` — the GUI launcher.
-- `ufmgr-cli.exe` — the command-line interface.
+```bat
+cd desktop-windows
+build.bat
+```
+
+Requires MinGW-w64 with `windres`. Produces `ufmgr.exe` and `ufmgr-cli.exe`.
 
 ---
 
-## Files of interest
+## Files
 
-- `ufmgr.exe` — the GUI launcher.
-- `ufmgr-cli.exe` — the command-line interface.
-- `cli.cpp` — the CLI source code.
-- `gui_app.cpp` — the GUI source code.
-- `urfm_common.cpp` / `urfm_common.h` — shared engine (config parsing, PDF report, revert) used by both.
-- `config.json` — sorting rules (edit to add extensions or categories).
-- `organizer.log` — full audit log of every action.
-- `organization_report.pdf` — generated report (created on organize, deleted on revert).
+| File | Purpose |
+|------|---------|
+| `ufmgr.exe` | GUI launcher |
+| `ufmgr-cli.exe` | CLI binary |
+| `cli.cpp` | CLI source code |
+| `gui_app.cpp` | GUI source code |
+| `urfm_common.cpp` / `.h` | Shared engine (config parsing, PDF report, revert) |
+| `config.json` | Sorting rules (edit to customize) |
+| `organizer.log` | Audit log (created at runtime) |
+| `organization_report.pdf` | Report (created on organize, deleted on revert) |
