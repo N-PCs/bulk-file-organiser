@@ -1,185 +1,112 @@
 # urFileManager (urFM)
 
-A cross-platform utility that organizes cluttered folders into categorized subdirectories — Images, Documents, Audio, Video, Archives — in seconds. Comes with a polished GUI, CLI mode, dry-run preview, PDF reports, and customizable console themes.
+![Windows](https://img.shields.io/badge/Windows-0078D6?logo=windows&logoColor=white)
+![Linux](https://img.shields.io/badge/Linux-FCC624?logo=linux&logoColor=black)
+![Fedora](https://img.shields.io/badge/Fedora-294172?logo=fedora&logoColor=white)
+![Ubuntu](https://img.shields.io/badge/Ubuntu-E95420?logo=ubuntu&logoColor=white)
+![Debian](https://img.shields.io/badge/Debian-A81D33?logo=debian&logoColor=white)
+![MIT](https://img.shields.io/badge/License-MIT-green)
 
-**Platforms:** Windows (Native C++ Win32 GUI) · Linux (Java Swing GUI with Fedora RPM & Ubuntu DEB support)
+A cross-platform file organizer that sorts cluttered folders into categorized subdirectories — Images, Documents, Audio, Video, Archives — in seconds. Native C++ on Windows, Java on Linux.
 
 ## Features
 
-- **Smart Extension Sorting** — Moves loose files into category folders based on customizable rules in `config.json`
-- **Dry-Run Preview** — Preview every move before committing (enabled by default for safety)
-- **PDF Reports** — Generate detailed organization reports with file names, sizes, and status
-- **Full Audit Logging** — Every action recorded in `organizer.log` with timestamps
-- **Conflict Resolution** — Duplicates renamed automatically (e.g. `report (1).pdf`)
-- **Six UI Themes** — Midnight Dark, Minimalist Light, Red Sakura, Forest Emerald, Neon Cyberpunk, Obsidian Volt
-- **Editable Config** — Add file types or categories via `config.json` — no recompile needed
-- **GUI + CLI Modes** — Double-click for the GUI, or pass a folder path for scripting
-
-## Project Structure
-
-```
-├── frontend-web/              # React + Vite marketing site
-│   ├── src/
-│   └── public/
-├── desktop-windows/          # Desktop GUI applications
-│   ├── gui_win32.cpp          # Windows native Win32 GUI (C++)
-│   ├── gui_fltk.cpp           # Cross-platform FLTK GUI (C++, Linux)
-│   ├── gui.cpp                # GUI redirect (platform dispatch)
-│   ├── core.h / core.cpp      # Shared cross-platform logic
-│   ├── build.bat              # Windows build script
-│   ├── build.sh               # Linux build script
-│   ├── ufmgr.bat              # Windows CLI wrapper
-│   ├── run.bat                # Windows GUI launcher
-│   ├── ufmgr.rc               # Windows resource file
-│   └── ufmgr.manifest         # Windows manifest
-├── desktop-linux/                # Linux Java Swing GUI (terminal aesthetic)
-│   ├── src/urfm/              # Java sources
-│   ├── build.sh               # Java build script
-│   ├── MANIFEST.MF            # JAR manifest
-│   └── RELEASE_README.md      # Quick start
-├── organizer.py               # Python CLI (cross-platform)
-├── config.json                # Sorting rules configuration
-├── scripts/                   # Release automation
-└── release/                   # Release binaries
-```
-
-## Workflow Diagram
-![workflow-diagram](workflow.png)
+- **Smart sorting** — moves files into category folders by extension (rules in `config.json`)
+- **Dry-run preview** — see every move before committing, safe by default
+- **PDF reports** — detailed report with file names, sizes, and status
+- **Audit log** — every action recorded in `organizer.log`
+- **Conflict resolution** — duplicates renamed automatically (e.g. `report (1).pdf`)
+- **Six GUI themes** — Midnight Dark, Minimalist Light, Red Sakura, Forest Emerald, Neon Cyberpunk, Obsidian Volt
+- **Editable config** — add or remove file types in `config.json`, no recompile
+- **GUI + CLI** — double-click for GUI or pass a folder path from the terminal
 
 ## Quick Start
 
 ### Windows
 
-1. Download `urfm-windows.zip` from the [website](https://urfilemanager.vercel.app) or via CLI:
-
-```powershell
-# PowerShell
-Invoke-WebRequest -Uri "https://urfilemanager.vercel.app/urfm-windows.zip" -OutFile "urfm-windows.zip"
+```bat
+cd desktop-windows
+build.bat                              # compile (requires MinGW-w64)
+ufmgr.exe                              # launch GUI
+ufmgr-cli.exe "C:\Downloads"           # preview (safe)
+ufmgr-cli.exe "C:\Downloads" --no-dry-run  # execute
+ufmgr-cli.exe --revert "C:\Downloads"  # undo
 ```
 
-```cmd
-curl -L -o urfm-windows.zip "https://urfilemanager.vercel.app/urfm-windows.zip"
-```
-
-2. Extract anywhere
-3. Double-click `run.bat` to launch the GUI, or use:
-
-```powershell
-.\ufmgr.exe C:\Downloads --dry-run
-```
-
-### Linux (Fedora RPM — recommended)
-
-1. Download the `urfm-1.0.0-1.noarch.rpm` package.
-2. Install the package:
+### Linux (Java)
 
 ```bash
-sudo dnf install ./urfm-1.0.0-1.noarch.rpm
+cd desktop-linux
+./build.sh                             # compile (requires JDK 17+)
+./urfm                                 # launch GUI
+./urfm ~/Downloads --dry-run           # preview
+./urfm ~/Downloads                     # execute
+./urfm ~/Downloads --revert            # undo
 ```
 
-3. Run it from the application menu, or via terminal:
+Install via RPM or DEB for system-wide access.
+
+### Python (any OS)
 
 ```bash
-urfm                           # Launch GUI
-urfm ~/Downloads --dry-run    # Preview organization
-urfm ~/Downloads               # Run organization
-urfm ~/Downloads --revert      # Undo last run
-urfm --version                 # Show version
-urfm --gui                     # Force open GUI (even with a directory arg)
+pip install -r requirements.txt
+python organizer.py ~/Downloads --dry-run
+python organizer.py ~/Downloads
+python organizer.py ~/Downloads --revert
 ```
 
-### Linux (Ubuntu DEB)
+## Project Structure
 
-1. Download the `urfm_1.0.0_all.deb` package.
-2. Install the package:
-
-```bash
-sudo dpkg -i ./urfm_1.0.0_all.deb
-sudo apt install -f            # Fix any missing dependencies
 ```
-
-3. Run it from the application menu, or via terminal:
-
-```bash
-urfm                           # Launch GUI
-urfm ~/Downloads --dry-run    # Preview organization
-urfm ~/Downloads               # Run organization
-urfm ~/Downloads --revert      # Undo last run
-urfm --version                 # Show version
-urfm --gui                     # Force open GUI (even with a directory arg)
-```
-
-### Linux (Java Tarball)
-
-1. Download `urfm-linux.tar.gz` and extract it.
-2. Install Java 17+ runtime if not already present:
-
-```bash
-sudo apt install openjdk-17-jre   # Ubuntu
-sudo dnf install java-17-openjdk  # Fedora
-```
-
-3. Run the application:
-
-```bash
-chmod +x urfm
-./urfm                           # Launch GUI
-./urfm ~/Downloads --dry-run    # Preview organization
-./urfm ~/Downloads               # Run organization
-./urfm ~/Downloads --revert      # Undo last run
-./urfm --version                 # Show version
-./urfm --gui                     # Force open GUI (even with a directory arg)
+├── desktop-windows/           # Windows C++ app (Win32 GUI + CLI)
+│   ├── cli.cpp                # CLI entry point
+│   ├── gui_app.cpp            # Win32 GUI entry point
+│   ├── urfm_common.h/.cpp     # Shared engine (config, PDF, revert)
+│   ├── config.json            # Category-to-extension mapping
+│   ├── build.bat              # Build script (MinGW-w64)
+│   ├── ufmgr.exe / ufmgr-cli.exe  # Compiled binaries
+│   └── windows_usage.md       # Full usage guide
+├── desktop-linux/             # Linux Java Swing GUI
+│   ├── src/urfm/              # Java sources
+│   ├── build.sh               # Build script
+│   └── RELEASE_README.md      # Quick start
+├── frontend-web/              # React + Vite marketing site
+├── organizer.py               # Python CLI (cross-platform)
+├── config.json                # Sorting rules (shared)
+└── scripts/                   # Release automation
 ```
 
 ## Building from Source
 
-### Windows (native Win32 GUI)
+| Platform | Command | Requirements |
+|----------|---------|-------------|
+| Windows | `cd desktop-windows && build.bat` | MinGW-w64 with windres |
+| Linux (Java) | `cd desktop-linux && ./build.sh` | JDK 17+ |
+| Python | `pip install -r requirements.txt` | Python 3.8+ |
 
-Requires MinGW-w64 with `windres`.
+## Configuration
 
-```cmd
-cd desktop-windows
-build.bat
+Edit `config.json` to customize rules:
+
+```json
+{
+  "Images": [".jpeg", ".jpg", ".png", ".gif", ".bmp"],
+  "Documents": [".pdf", ".docx", ".txt", ".pptx", ".xlsx"],
+  "Audio": [".mp3", ".wav", ".aac", ".flac"],
+  "Video": [".mp4", ".mov", ".avi", ".mkv", ".webm"],
+  "Archives": [".zip", ".rar", ".tar", ".gz", ".7z"]
+}
 ```
 
-### Linux — Java Terminal Edition
+Unrecognized extensions go into `Other/`.
 
-```bash
-cd desktop-linux
-chmod +x build.sh
-./build.sh
-# Produces urfm.jar + urfm launcher
+## Releases
+
+Release archives and the manifest (`downloads.json`) live in `frontend-web/public/`.
+
+```powershell
+.\scripts\package-release.ps1   # builds Windows zip + Linux tarball
 ```
-
-### Linux — FLTK GUI (alternative)
-
-```bash
-cd desktop-windows
-chmod +x build.sh
-./build.sh
-```
-
-### Python (cross-platform CLI)
-
-Works on all platforms without compilation.
-
-```bash
-pip install tqdm
-python organizer.py ~/Downloads
-```
-
-## Releasing (website downloads)
-
-Release archives must live in `frontend-web/public/` so Vite copies them into the deployed site.
-
-```bash
-# From project root — builds Java Swing files, packaging Linux tarball and RPM (if rpmbuild exists)
-./scripts/package-release.sh
-```
-
-Then commit `frontend-web/public/urfm-*.zip`, `urfm-*.tar.gz`, and `downloads.json`, and push to redeploy.
-
-Made with ❤️ by @N-PCs 
 
 ## License
 
