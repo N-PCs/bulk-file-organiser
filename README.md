@@ -13,7 +13,7 @@ A cross-platform bulk file organizer that sorts cluttered folders into neat cate
 
 ---
 
-## ✨ Features
+## Features
 
 - **Smart Extension Sorting** — Moves loose files into category folders based on customizable rules in `config.json`.
 - **Dry-Run Preview** — Preview every move before committing (enabled by default for safety).
@@ -28,7 +28,7 @@ A cross-platform bulk file organizer that sorts cluttered folders into neat cate
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 bulk-file-organiser/
@@ -77,7 +77,7 @@ bulk-file-organiser/
 
 ---
 
-## ⬇️ Download
+## Download
 
 ### Via Command Line
 
@@ -106,7 +106,7 @@ sudo apt install ./urfm_1.0.0_all.deb
 
 ---
 
-## 🚀 Usage
+## Usage
 
 ### Windows
 
@@ -217,7 +217,7 @@ Map each category name to a list of **lowercase** extensions:
 
 ---
 
-## 🔄 How It Works
+## How It Works
 
 1. You point the app at a folder (via the GUI or CLI).
 2. It reads `config.json` and builds a category → extension map.
@@ -227,7 +227,7 @@ Map each category name to a list of **lowercase** extensions:
 
 ---
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 **Windows**
 - *Antivirus blocks the `.exe`* — add an exception for the extracted folder.
@@ -241,6 +241,6 @@ Map each category name to a list of **lowercase** extensions:
 
 ---
 
-## 📜 License
+## License
 
 MIT
