@@ -1,6 +1,13 @@
 # urFileManager (urFM)
 
-A cross-platform utility that organizes cluttered folders into categorized subdirectories — Images, Documents, Audio, Video, Archives — in seconds. Comes with a native Win32 GUI (Windows) and Java Swing GUI (Linux), plus CLI mode, dry-run preview, PDF reports, and customizable themes.
+![Windows](https://img.shields.io/badge/Windows-0078D6?logo=windows&logoColor=white)
+![Linux](https://img.shields.io/badge/Linux-FCC624?logo=linux&logoColor=black)
+![Fedora](https://img.shields.io/badge/Fedora-294172?logo=fedora&logoColor=white)
+![Ubuntu](https://img.shields.io/badge/Ubuntu-E95420?logo=ubuntu&logoColor=white)
+![Debian](https://img.shields.io/badge/Debian-A81D33?logo=debian&logoColor=white)
+![MIT](https://img.shields.io/badge/License-MIT-green)
+
+A cross-platform file organizer that sorts cluttered folders into categorized subdirectories — Images, Documents, Audio, Video, Archives — in seconds. Native C++ on Windows, Java on Linux.
 
 **Platforms:** Windows (Native C++ Win32 GUI) · Linux (Java Swing GUI with Fedora RPM & Ubuntu DEB support)
 
@@ -15,6 +22,7 @@ Download the release zip / tarball from any terminal:
 | Windows (PowerShell) | `Invoke-WebRequest -Uri "https://urfilemanager.vercel.app/urfm-windows.zip" -OutFile "urfm-windows.zip"` |
 | Windows (CMD) | `curl -L -o urfm-windows.zip "https://urfilemanager.vercel.app/urfm-windows.zip"` |
 | Linux (tarball) | `curl -LO "https://urfilemanager.vercel.app/urfm-linux.tar.gz"` |
+| Linux (wget) | `wget -O urfm-linux.tar.gz "https://urfilemanager.vercel.app/urfm-linux.tar.gz"` |
 
 ### Package Manager Install (Linux)
 
@@ -32,38 +40,46 @@ sudo apt install ./urfm_1.0.0_all.deb
 
 ### Windows
 
-Extract the ZIP, then:
+Extract the ZIP anywhere, then use the GUI or CLI from that folder.
 
-```powershell
-.\ufmgr.exe                          # Launch GUI
-.\ufmgr-cli.exe C:\Downloads         # Preview (dry-run is the default)
-.\ufmgr-cli.exe C:\Downloads --no-dry-run  # Actually move files
-.\ufmgr-cli.exe --revert C:\Downloads      # Undo last organization
-```
+**GUI:** Double-click `run.bat` or `ufmgr.exe`, pick a folder, and click **Start Organizing**. Dry-run is checked by default — uncheck to actually move files.
+
+**CLI (`ufmgr-cli.exe`):**
+
+| Command | Description |
+|---------|-------------|
+| `ufmgr-cli.exe "C:\Downloads"` | Preview organization (safe — dry-run is the default) |
+| `ufmgr-cli.exe "C:\Downloads" --no-dry-run` | Actually move files into category folders |
+| `ufmgr-cli.exe --revert "C:\Downloads"` | Undo a previous organization of that folder |
+| `ufmgr-cli.exe -h` | Show help |
+
+Output is color-coded (`[DRY-RUN]`, `[MOVED]`, `[ERROR]`) and writes `organizer.log` plus a PDF report into the target folder. Both `--flag` and `-flag` styles are accepted.
 
 ### Linux
 
 **Tarball:** `tar -xzf urfm-linux.tar.gz && chmod +x urfm && ./urfm`
 
-**RPM/DEB:** Run `urfm` from terminal or launch from app menu.
+**RPM/DEB:** Launch **urFileManager** from the app menu, or run `urfm` in a terminal. Requires Java 17+.
 
-```bash
-urfm ~/Downloads --dry-run    # Preview
-urfm ~/Downloads               # Organize
-urfm ~/Downloads --revert      # Undo
-urfm --version                 # Show version
-```
+| Command | Description |
+|---------|-------------|
+| `urfm` | Launch the Java Swing GUI |
+| `urfm ~/Downloads --dry-run` | Preview moves & generate a preview PDF (no filesystem changes) |
+| `urfm ~/Downloads` | Organize the target directory |
+| `urfm ~/Downloads --revert` | Undo the last organization on that folder |
+| `urfm --version` | Print the app version |
+| `urfm --gui` | Force open the GUI even when a directory argument is given |
 
 ## Building from Source
 
 ### Windows (MinGW-w64)
 
+Requires MinGW-w64 with `windres`.
+
 ```cmd
 cd desktop-windows
 build.bat
 ```
-
-Requires MinGW-w64 with `windres`.
 
 ### Linux — Java Swing
 
@@ -84,7 +100,7 @@ cd desktop-linux
 
 ## Configuration
 
-Sorting rules are defined in `config.json` (placed next to the executable). Map category names to lowercase extension lists:
+Sorting rules are defined in `config.json` (placed next to the executable on Windows, or next to `urfm.jar` / its parent / the current directory on Linux). Map category names to lowercase extension lists:
 
 ```json
 {
@@ -96,7 +112,7 @@ Sorting rules are defined in `config.json` (placed next to the executable). Map 
 }
 ```
 
-Files with unrecognized extensions land in an `Other/` folder. After editing `config.json`, restart the app or re-run the CLI.
+Files with unrecognized extensions land in an `Other/` folder. After editing `config.json`, restart the app or re-run the CLI to reload the rules.
 
 ## License
 
