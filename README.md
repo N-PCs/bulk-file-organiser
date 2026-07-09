@@ -51,7 +51,7 @@ A cross-platform bulk file organizer that sorts cluttered folders into neat cate
 
 ---
 ## Workflow Diagram
-![workflow] (/workflow.svg)
+![urFileManager Workflow Diagram](workflow.svg)
 
 ---
 
